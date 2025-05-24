@@ -93,8 +93,7 @@ function Formulario() {
           name="cantidad"
           min="1"
           placeholder="Ingresa la cantidad"
-          required
-        />
+          required/>
 
         <label htmlFor="categoria">Categoría:</label>
         <select id="categoria" name="categoria" required>

@@ -111,18 +111,25 @@ input[type="text"] {
   margin-right: 1rem;
 }
 
+.valy {
+  display: flex;
+  margin-bottom: 3em;
+}
+
 /*.out-of-stock {
   color: red;
   font-style: italic;
 }*/
 
-.cont:hover {
-  transform: scale(1.03);
-  width: 220px;
+.cont {
+  position: relative; 
+  width: max-content; 
+  background-color: #4b953b;
+  left: 32%;
 }
 
-.cont:hover .left-side {
-  width: 100%;
+.cont:hover {
+  transform: scale(1.03);
 }
 
 .left-side {
@@ -151,22 +158,6 @@ input[type="text"] {
   transition: 0.3s;
 }
 
-.right-side:hover {
-  background-color: #f9f7f9;
-}
-
-.arrow {
-  width: 20px;
-  height: 20px;
-  margin-right: 20px;
-}
-
-.new {
-  font-size: 23px;
-  font-family: "Lexend Deca", sans-serif;
-  margin-left: 20px;
-}
-
 .card {
   width: 70px;
   height: 46px;
@@ -188,12 +179,12 @@ input[type="text"] {
 }
 
 @media only screen and (max-width: 480px) {
-  .cont {
-    transform: scale(0.7);
-  }
+  .container {
+    transform: scale(1.1);
+  } 
 
   .cont:hover {
-    transform: scale(0.74);
+    transform: scale(1.1);
   }
 }
 
@@ -251,7 +242,7 @@ input[type="text"] {
   height: 9px;
   background-color: #545354;
   position: absolute;
-  border-radius: 0 0 3px 3px;
+  border-radius: 0px 0px 3px 3px;
   right: 8px;
   top: 8px;
 }

@@ -82,7 +82,7 @@ function Formulario() {
   return (
     <section className="section formulario">
       <h2>Agregar Producto</h2>
-      <form id="form-add-product">
+      <form id="form-add-product" className='valy'>
         <label htmlFor="nombre">Producto:</label>
         <input type="text" id="nombre" required />
 
@@ -110,7 +110,7 @@ function Formulario() {
         </select>
         <button type="submit">Agregar Producto</button>
       </form>
-      <Animation$ />
+      <Animation/>
     </section>
   );
 }
@@ -151,7 +151,7 @@ export default function App() {
   );
 }
 
-function Animation$() {
+function Animation() {
   return (
     <section className="cont">
       <section className="left-side">

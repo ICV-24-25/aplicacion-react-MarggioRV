@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChange }) {
   return (
@@ -44,7 +44,7 @@ function ProductTable({ products, filterText, inStockOnly }) {
           id={`categoria${category}`}
         >
           <h4>{category}</h4>
-          <ul id={`categoria${category}List`} style={{ listStyle: "none", paddingLeft: 0 }}>
+          <ul id={`categoria${category}List`}>
             {items.map(item => (
               <li key={item.name}>
                 <article>
@@ -98,7 +98,7 @@ function Formulario() {
 
         <label htmlFor="categoria">Categoría:</label>
         <select id="categoria" name="categoria" required>
-          <option value="" disabled selected>
+          <option value="" disabled>
             Selecciona una...
           </option>
           <option value="categoriaLacteos">Lácteos</option>

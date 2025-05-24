@@ -1,0 +1,20 @@
+[
+  {
+    "nombre": "Manzanas",
+    "cantidad": 5,
+    "categoria": "Frutas",
+    "enStock": true
+  },
+  {
+    "nombre": "Pan",
+    "cantidad": 0,
+    "categoria": "Panadería",
+    "enStock": false
+  },
+  {
+    "nombre": "Leche",
+    "cantidad": 10,
+    "categoria": "Lácteos",
+    "enStock": true
+  }
+]

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Página de Compras Responsive</title>
+</head>
+<body>
+  <header>
+    <h1>Página de Compras</h1>
+  </header>
+
+  <div class="container-padre">
+
+    <section class="section categorias">
+      <h2>Productos</h2>
+            <div class="categoria" id="categoriaLacteos">
+        <h4>Lácteos</h4>
+        <ul id="categoriaLacteosList"></ul>
+        <article>Leche</article>
+      </div>
+
+      <div class="categoria" id="categoriaCarnes">
+        <h4>Carnes</h4>
+        <ul id="categoriaCarnesList"></ul>
+        <article>Pollo</article>
+      </div>
+
+      <div class="categoria" id="categoriaVerduras">
+        <h4>Verduras</h4>
+        <ul id="categoriaVerdurasList"></ul>
+        <article>Zanahorias</article>
+      </div>
+
+      <div class="categoria" id="categoriaFrutas">
+        <h4>Frutas</h4>
+        <ul id="categoriaFrutasList"></ul>
+        <article>Manzanas</article>
+      </div>
+
+      <div class="categoria" id="categoriaPanaderia">
+        <h4>Panadería</h4>
+        <ul id="categoriaPanaderiaList"></ul>
+        <article>Pan Integral</article>
+      </div>
+
+      <div class="categoria" id="categoriaBebidas">
+        <h4>Bebidas</h4>
+        <ul id="categoriaBebidasList"></ul>
+        <article>Jugo de Naranja</article>
+      </div><br>
+    </section>
+
+    <!-- Contenedor para Agregar Producto -->
+    <section class="section formulario">
+      <h2>Agregar Producto</h2>
+      <form id="form-add-product">
+
+        <label for="nombre">Producto:</label>
+        <input type="text" id="nombre" required>
+
+
+         <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" name="cantidad" min="1" placeholder="Ingresa la cantidad" required>
+
+        <label for="categoria">Categoría:</label>
+        <select id="categoria" name="categoria" required>
+          <option value="" disabled selected>Selecciona una...</option>
+          <option value="categoriaLacteos">Lácteos</option>
+          <option value="categoriaCarnes">Carnes</option>
+          <option value="categoriaVerduras">Verduras</option>
+          <option value="categoriaFrutas">Frutas</option>
+          <option value="categoriaPanaderia">Panadería</option>
+          <option value="categoriaBebidas">Bebidas</option>
+        </select><br>
+
+        <button type="submit">Agregar Producto</button>
+      </form>
+    </section>
+
+    <!-- Contenedor para la Lista de Compras -->
+    <section class="section shopping">
+      <h2>Lista de Compras</h2>
+      <ul class="shopping-list">
+        <!-- Ejemplo de items en la lista -->
+        <li>Producto A - 2 unidades</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>

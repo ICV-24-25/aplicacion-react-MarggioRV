@@ -1,0 +1,113 @@
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #FFE5B4;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      padding: 1em;
+      background-color: #FFA500;
+      color: #fff;
+      margin-bottom: 1em;
+    }
+
+      /* Contenedor principal */
+    .container-padre {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1em;
+      padding: 1em;
+    }
+
+    /* Para pantallas de laptops y computadoras */
+    @media screen and (min-width: 768px) {
+      .container-padre {
+        grid-template-columns: 2fr 1fr;
+      }
+      /* El contenedor de la lista_compras ocupa la fila completa */
+      .shopping {
+        grid-column: span 2;
+      }
+    }
+
+        /* Estilos de sección */
+    .section {
+      padding: 1em;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .section h2 {
+      margin-bottom: 0.5em;
+      text-align: center;
+    }
+
+  .shopping {
+  background-color: #C8A080;
+  border: 3px dashed black;
+  border-radius: 15px;
+}
+
+.categorias,
+.formulario {
+  background-color: #FFA500;
+  border: 3px dashed black;
+  border-radius: 15px;
+}
+
+/* Section de Lista_Compras*/
+    .shopping-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .shopping-list li {
+      padding: 0.5em;
+      border-bottom: 1px solid #ccc;
+    }
+
+ /* Contenedor de Producto */
+    .categoria {
+      padding: 0.5em;
+      border-bottom: 1px solid #ccc;
+    }
+
+    /* Contenedor para Agregar Producto */
+    .formulario form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8em;
+    }
+
+    .formulario label {
+      font-weight: bold;
+    }
+
+    .formulario input,
+    .formulario select {
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    .formulario button {
+      padding: 0.6em;
+      background-color: #8B4513;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .formulario button:hover {
+      background-color: #FFB347;
+    }

@@ -110,6 +110,7 @@ function Formulario() {
         </select>
         <button type="submit">Agregar Producto</button>
       </form>
+      <Animation$ />
     </section>
   );
 }
@@ -149,3 +150,26 @@ export default function App() {
     </div>
   );
 }
+
+function Animation$() {
+  return (
+    <section className="cont">
+      <section className="left-side">
+        <section className="card">
+          <div className="card-line"></div>
+          <div className="buttons"></div>
+        </section>
+        <section className="post">
+          <div className="post-line"></div>
+          <div className="screen">
+            <div className="dollar">$</div>
+          </div>
+          <div className="numbers"></div>
+          <div className="numbers-line2"></div>
+        </section>
+      </section>
+      <section className="right-side"></section>
+    </section>
+  );
+}
+

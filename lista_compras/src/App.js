@@ -1,25 +1,28 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // Diccionario: Colores x Categoría
 const categoryColors = {
-  'Lacteos': '#d0f0c0',
-  'Carnes': '#f4cccc',
-  'Verduras': '#d9ead3',
-  'Frutas': '#fff2cc',
+  'Lacteos': '#87CEEB',
+  'Carnes': '#E75480',
+  'Verduras': '#88E788',
+  'Frutas': '#32CD32',
   'Panaderia': '#fce5cd',
-  'Bebidas': '#d0e0e3'
+  'Bebidas': '#00AAE4'
 };
 
+/*===SearchBar===*/
 function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChange }) {
   return (
     <form>
+      {/* Input de búsqueda */}
       <input
         type="text"
         placeholder="Buscar..."
         value={filterText}
         onChange={e => onFilterTextChange(e.target.value)}
       />
+      {/* Checkbox para mostrar solo productos en stock */}
       <label>
         <input
           type="checkbox"
@@ -31,8 +34,9 @@ function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChang
   );
 }
 
+/*===ProductTable===*/
 function ProductTable({ products, filterText, inStockOnly }) {
-  // Agrupa los productos por categoría
+  // Agrupa los productos por categoría si coinciden con el filtro
   const groupedProducts = products.reduce((acc, product) => {
     if (
       product.name.toLowerCase().includes(filterText.toLowerCase()) &&
@@ -62,9 +66,10 @@ function ProductTable({ products, filterText, inStockOnly }) {
       </thead>
       <tbody>
         {Object.entries(groupedProducts).map(([category, items]) => {
-          const bgColor = categoryColors[category] || 'white';
+          const bgColor = categoryColors[category] || 'white'; // Color de fondo por categoría
           return items.map((item, index) => (
             <tr key={`${category}-${item.name}`}>
+              {/* Solo muestra el nombre de la categoría en la primera fila */}
               {index === 0 ? (
                 <td className="categoria" style={{ backgroundColor: bgColor }}>
                   {category}
@@ -72,10 +77,12 @@ function ProductTable({ products, filterText, inStockOnly }) {
               ) : (
                 <td style={{ backgroundColor: bgColor }}></td>
               )}
+              {/* Producto */}
               <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                 {item.name}
                 {!item.stocked && " (No disponible)"}
               </td>
+              {/* Precio */}
               <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                 {item.price}
               </td>
@@ -87,9 +94,10 @@ function ProductTable({ products, filterText, inStockOnly }) {
   );
 }
 
+/*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
-  const [filterText, setFilterText] = useState('');
-  const [inStockOnly, setInStockOnly] = useState(false);
+  const [filterText, setFilterText] = useState(''); // Texto de búsqueda
+  const [inStockOnly, setInStockOnly] = useState(false); // Checkbox de stock
 
   return (
     <section className="section categorias" id="productosSection">
@@ -105,14 +113,17 @@ function FilterableProductTable({ products }) {
   );
 }
 
+/*===Formulario===*/
 function Formulario() {
   return (
     <section className="section formulario">
       <h2>Agregar Producto</h2>
       <form id="form-add-product" className="valy">
+        {/* Nombre del producto */}
         <label htmlFor="nombre">Producto:</label>
         <input type="text" id="nombre" required />
 
+        {/* Cantidad */}
         <label htmlFor="cantidad">Cantidad:</label>
         <input
           type="number"
@@ -123,6 +134,7 @@ function Formulario() {
           required
         />
 
+        {/* Categoría */}
         <label htmlFor="categoria">Categoría:</label>
         <select id="categoria" name="categoria" required>
           <option value="" disabled>Selecciona una...</option>
@@ -133,6 +145,8 @@ function Formulario() {
           <option value="categoriaPanaderia">Panadería</option>
           <option value="categoriaBebidas">Bebidas</option>
         </select>
+
+        {/* Botón de enviar */}
         <button type="submit">Agregar Producto</button>
       </form>
       <Animation />
@@ -140,17 +154,20 @@ function Formulario() {
   );
 }
 
+/*===ListaCompras===*/
 function ListaCompras() {
   return (
     <section className="section shopping">
       <h2>Lista de Compras</h2>
       <ul className="shopping-list">
-        <li>Producto A - 2 unidades</li>
+        {/* Aquí se añadirán los productos de compra */}
+        <li></li>
       </ul>
     </section>
   );
 }
 
+/*===PRODUCTOS DE PRUEBA===*/
 const PRODUCTS = [
   { category: "Lacteos", price: "$2", stocked: true, name: "Leche" },
   { category: "Carnes", price: "$5", stocked: true, name: "Pollo" },
@@ -166,6 +183,7 @@ const PRODUCTS = [
   { category: "Bebidas", price: "$2", stocked: true, name: "Jugo de Naranja" }
 ];
 
+/*===App Principal===*/
 export default function App() {
   return (
     <div className="container-padre">
@@ -176,6 +194,7 @@ export default function App() {
   );
 }
 
+/*===Animación Visual (Decorativa)===*/
 function Animation() {
   return (
     <section className="cont">

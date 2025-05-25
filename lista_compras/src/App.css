@@ -51,13 +51,41 @@
 
 /* Lista de compras */
 .shopping-list {
-  list-style: none;
-  padding-left: 0;
+  list-style-type: none;
+  padding: 0;
 }
 
-.shopping-list li {
+.compra-item {
   padding: 0.5em;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compra-item span {
+  flex: 1;
+  text-align: left;
+}
+
+.producto {
+  min-width: 100px;
+}
+
+.cantidad {
+  text-align: center;
+  min-width: 150px;
+}
+
+.total {
+  text-align: right;
+  min-width: 120px;
+}
+
+.total-general {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 1.2em;
 }
 
 /* Estilo de categoría */
@@ -326,6 +354,7 @@ input[type="text"] {
   }
 }
 
+/*=== Tabla ===*/
 .product-table {
   width: 100%;
   border-collapse: collapse;
@@ -364,3 +393,4 @@ input[type="text"] {
   font-style: italic;
 }
 
+/*=== Impresión ===*/

@@ -173,16 +173,28 @@ function Formulario({ products, onAgregarCompra }) {
 
 /*===Lista de Compras con items agregados===*/
 function ListaCompras({ compras }) {
+  // Calcular total general
+  const totalGeneral = compras.reduce((acc, item) => {
+    const num = parseFloat(item.total.replace('$', ''));
+    return acc + num;
+  }, 0);
+
   return (
     <section className="section shopping">
       <h2>Lista de Compras</h2>
       <ul className="shopping-list">
         {compras.map((item, index) => (
-          <li key={index}>
-            {item.nombre} - Cantidad: {item.cantidad} - Total: {item.total}
+          <li className="compra-item" key={index}>
+            <span className="producto">{item.nombre}</span>
+            <span className="cantidad">Cantidad: {item.cantidad}</span>
+            <span className="total">Total: {item.total}</span>
           </li>
         ))}
       </ul>
+      <hr />
+      <section className="total-general">
+        <strong>Total: ${totalGeneral.toFixed(2)}</strong>
+      </section>
     </section>
   );
 }

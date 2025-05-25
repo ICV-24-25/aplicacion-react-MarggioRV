@@ -1,13 +1,13 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 
-// Diccionario: Colores x Categoría
+// Diccionario: Colores x categoría 
 const categoryColors = {
-  'Lacteos': '#87CEEB',
+  'Lácteos': '#87CEEB',
   'Carnes': '#E75480',
   'Verduras': '#88E788',
   'Frutas': '#32CD32',
-  'Panaderia': '#fce5cd',
+  'Panadería': '#fce5cd',
   'Bebidas': '#00AAE4'
 };
 
@@ -154,7 +154,7 @@ function Formulario() {
   );
 }
 
-/*===ListaCompras===*/
+/*===Lista de Compras===*/
 function ListaCompras() {
   return (
     <section className="section shopping">
@@ -167,34 +167,9 @@ function ListaCompras() {
   );
 }
 
-/*===PRODUCTOS DE PRUEBA===*/
-const PRODUCTS = [
-  { category: "Lacteos", price: "$2", stocked: true, name: "Leche" },
-  { category: "Carnes", price: "$5", stocked: true, name: "Pollo" },
-  { category: "Verduras", price: "$2", stocked: true, name: "Zanahorias" },
-  { category: "Verduras", price: "$2", stocked: true, name: "Espinaca" },
-  { category: "Verduras", price: "$4", stocked: false, name: "Calabaza" },
-  { category: "Verduras", price: "$1", stocked: true, name: "Guisantes" },
-  { category: "Frutas", price: "$1", stocked: true, name: "Manzana" },
-  { category: "Frutas", price: "$1", stocked: true, name: "Fruta del dragón" },
-  { category: "Frutas", price: "$2", stocked: false, name: "Maracuyá" },
-  { category: "Frutas", price: "$1", stocked: true, name: "Manzanas" },
-  { category: "Panaderia", price: "$3", stocked: true, name: "Pan Integral" },
-  { category: "Bebidas", price: "$2", stocked: true, name: "Jugo de Naranja" }
-];
+/*Bueno, aqui ibaa el array de los prodcuto, el cost*/
 
-/*===App Principal===*/
-export default function App() {
-  return (
-    <div className="container-padre">
-      <FilterableProductTable products={PRODUCTS} />
-      <Formulario />
-      <ListaCompras />
-    </div>
-  );
-}
-
-/*===Animación Visual (Decorativa)===*/
+/*===Animación===*/
 function Animation() {
   return (
     <section className="cont">
@@ -214,5 +189,28 @@ function Animation() {
       </section>
       <section className="right-side"></section>
     </section>
+  );
+}
+
+/*===App Principal===*/
+export default function App() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch('/productos.json')
+      .then(response => {
+        if (!response.ok) throw new Error('Error al cargar los productos');
+        return response.json();
+      })
+      .then(data => setProducts(data))
+      .catch(error => console.error('Error al obtener los productos:', error));
+  }, []);
+
+  return (
+    <div className="container-padre">
+      <FilterableProductTable products={products} />
+      <Formulario />
+      <ListaCompras />
+    </div>
   );
 }

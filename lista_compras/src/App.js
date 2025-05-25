@@ -22,10 +22,11 @@ function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChang
 }
 
 function ProductTable({ products, filterText, inStockOnly }) {
-  const groupedProducts = products.reduce((acc, product) => {
+  const groupedProducts = products.reduce((acc, product) => { 
     if (
       product.name.toLowerCase().includes(filterText.toLowerCase()) &&
-      (!inStockOnly || product.stocked)
+      (!inStockOnly || product.stocked) 
+      // Marcar checkbox = true; product.stocked = true si esta enStock.
     ) {
       if (!acc[product.category]) {
         acc[product.category] = [];

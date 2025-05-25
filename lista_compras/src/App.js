@@ -35,63 +35,125 @@ function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChang
 }
 
 /*===ProductTable===*/
-function ProductTable({ products, filterText, inStockOnly }) {
-  const groupedProducts = products.reduce((acc, product) => {
-    if (
-      product.name.toLowerCase().includes(filterText.toLowerCase()) &&
-      (!inStockOnly || product.stocked)
-    ) {
+function ProductTable({ products, criterioOrden }) {
+  if (criterioOrden === 'categoría') {
+    const groupedProducts = products.reduce((acc, product) => {
       if (!acc[product.category]) acc[product.category] = [];
       acc[product.category].push(product);
-    }
-    return acc;
-  }, {});
+      return acc;
+    }, {});
 
+    return (
+      <table className="product-table">
+        <colgroup>
+          <col className="col-30" />
+          <col className="col-50" />
+          <col className="col-20" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Producto</th>
+            <th>Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(groupedProducts).map(([category, items]) => {
+            const bgColor = categoryColors[category] || 'white';
+            return items.map((item, index) => (
+              <tr key={`${category}-${item.name}`}>
+                {index === 0 ? (
+                  <td className="categoria" style={{ backgroundColor: bgColor }}>
+                    {category}
+                  </td>
+                ) : (
+                  <td style={{ backgroundColor: bgColor }}></td>
+                )}
+                <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
+                  {item.name}
+                  {!item.stocked && " (No disponible)"}
+                </td>
+                <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
+                  {item.price}
+                </td>
+              </tr>
+            ));
+          })}
+        </tbody>
+      </table>
+    );
+  }
+
+  // Cuando no se agrupa por categoría: fondo gris
   return (
     <table className="product-table">
       <colgroup>
-        <col className="col-30" />
         <col className="col-50" />
-        <col className="col-20" />
+        <col className="col-50" />
       </colgroup>
       <thead>
         <tr>
-          <th>Categoría</th>
           <th>Producto</th>
           <th>Precio</th>
         </tr>
       </thead>
       <tbody>
-        {Object.entries(groupedProducts).map(([category, items]) => {
-          const bgColor = categoryColors[category] || 'white';
-          return items.map((item, index) => (
-            <tr key={`${category}-${item.name}`}>
-              {index === 0 ? (
-                <td className="categoria" style={{ backgroundColor: bgColor }}>
-                  {category}
-                </td>
-              ) : (
-                <td style={{ backgroundColor: bgColor }}></td>
-              )}
-              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
-                {item.name}
-                {!item.stocked && " (No disponible)"}
-              </td>
-              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
-                {item.price}
-              </td>
-            </tr>
-          ));
-        })}
+        {products.map((item) => (
+          <tr key={item.name} style={{ backgroundColor: '#8A9597' }}>
+            <td style={{ color: item.stocked ? 'black' : 'red' }}>
+              {item.name}
+              {!item.stocked && " (No disponible)"}
+            </td>
+            <td style={{ color: item.stocked ? 'black' : 'red' }}>
+              {item.price}
+            </td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );
 }
 
-/*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
   const [filterText, setFilterText] = useState('');
   const [inStockOnly, setInStockOnly] = useState(false);
+  const [criterioOrden, setCriterioOrden] = useState('categoría'); // Categoría, la opción, marcada por defecto
+  const [categoriasVisibles, setCategoriasVisibles] = useState({}); // Control de visibilidad
+
+  // Al cargar productos, activar todas las categorías
+  useEffect(() => {
+    const nuevasCategorias = [...new Set(products.map(p => p.category))];
+    const estadoInicial = nuevasCategorias.reduce((acc, cat) => {
+      acc[cat] = true; // todas visibles por defecto
+      return acc;
+    }, {});
+    setCategoriasVisibles(estadoInicial);
+  }, [products]); // se ejecuta solo cuando los productos cambian
+
+// Función para alternar visibilidad
+  const toggleCategoriaVisible = (categoria) => {setCategoriasVisibles(prev => ({
+      ...prev,
+      [categoria]: !prev[categoria]
+    }));
+  };
+
+  const precioANumero = (precioStr) => parseFloat(precioStr.replace('$', ''));
+
+  // filtra si la categoría está visible.
+  let productosFiltrados = products.filter(product =>
+    product.name.toLowerCase().includes(filterText.toLowerCase()) &&
+    (!inStockOnly || product.stocked) &&
+    categoriasVisibles[product.category]
+  );
+
+   // Ordenamiento según...
+  if (criterioOrden === 'nombre') {
+    productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (criterioOrden === 'precio') {
+    productosFiltrados.sort((a, b) => precioANumero(a.price) - precioANumero(b.price));
+  }
+
+  const categoriasUnicas = [...new Set(products.map(p => p.category))];
 
   return (
     <section className="section categorias" id="productosSection">
@@ -102,10 +164,47 @@ function FilterableProductTable({ products }) {
         onFilterTextChange={setFilterText}
         onInStockChange={setInStockOnly}
       />
-      <ProductTable products={products} filterText={filterText} inStockOnly={inStockOnly} />
+
+      {/* Selector de orden */}
+      <label>
+        Ordenar por:{' '}
+        <select value={criterioOrden} onChange={e => setCriterioOrden(e.target.value)}>
+          <option value="categoría">Categoría</option>
+          <option value="nombre">Nombre</option>
+          <option value="precio">Precio</option>
+        </select>
+      </label>
+
+      {/* Botones para mostrar/ocultar categorías */}
+      <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+        {categoriasUnicas.map(categoria => (
+          <button
+            key={categoria}
+            style={{
+              marginRight: '8px',
+              backgroundColor: categoriasVisibles[categoria] ? '#4CAF50' : '#f44336',
+              color: 'white',
+              border: 'none',
+              padding: '5px 10px',
+              cursor: 'pointer',
+              borderRadius: '4px',
+            }}
+            onClick={() => toggleCategoriaVisible(categoria)}
+            type="button"
+          >
+            {categoriasVisibles[categoria] ? `Ocultar ${categoria}` : `Mostrar ${categoria}`}
+          </button>
+        ))}
+      </div>
+
+      <ProductTable
+        products={productosFiltrados}
+        criterioOrden={criterioOrden}
+      />
     </section>
   );
 }
+
 
 /*===Formulario (Cálculo y envío)===*/
 function Formulario({ products, onAgregarCompra }) {

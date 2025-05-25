@@ -126,7 +126,7 @@ function Formulario({ products, onAgregarCompra }) {
     const precioNumerico = parseFloat(producto.price.replace('$', ''));
     const total = precioNumerico * cantidad;
 
-    // Llamamos a la función del padre para agregarlo a la lista
+    // Llama a la función del padre para agregarlo a la lista
     onAgregarCompra({
       nombre: producto.name,
       cantidad,

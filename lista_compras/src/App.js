@@ -1,6 +1,16 @@
 import './App.css';
 import { useState } from 'react';
 
+// Diccionario: Colores x Categoría
+const categoryColors = {
+  'Lacteos': '#d0f0c0',
+  'Carnes': '#f4cccc',
+  'Verduras': '#d9ead3',
+  'Frutas': '#fff2cc',
+  'Panaderia': '#fce5cd',
+  'Bebidas': '#d0e0e3'
+};
+
 function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChange }) {
   return (
     <form>
@@ -22,11 +32,10 @@ function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChang
 }
 
 function ProductTable({ products, filterText, inStockOnly }) {
-  const groupedProducts = products.reduce((acc, product) => { 
+  const groupedProducts = products.reduce((acc, product) => {
     if (
       product.name.toLowerCase().includes(filterText.toLowerCase()) &&
-      (!inStockOnly || product.stocked) 
-      // Marcar checkbox = true; product.stocked = true si esta enStock.
+      (!inStockOnly || product.stocked)
     ) {
       if (!acc[product.category]) {
         acc[product.category] = [];
@@ -37,27 +46,44 @@ function ProductTable({ products, filterText, inStockOnly }) {
   }, {});
 
   return (
-    <>
-      {Object.entries(groupedProducts).map(([category, items]) => (
-        <div
-          key={category}
-          className="categoria"
-          id={`categoria${category}`}
-        >
-          <h4>{category}</h4>
-          <ul id={`categoria${category}List`}>
-            {items.map(item => (
-              <li key={item.name}>
-                <article>
-                  {item.name} - {item.price}
-                  {!item.stocked && " (No disponible)"}
-                </article>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </>
+    <table className="product-table">
+      <colgroup>
+        <col className="col-30" />
+        <col className="col-70" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Productos y Precios</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.entries(groupedProducts).map(([category, items]) => {
+          const bgColor = categoryColors[category] || 'white';
+          return (
+            <tr key={category}>
+              <td className="categoria" style={{ backgroundColor: bgColor }}>
+                {category}
+              </td>
+              <td style={{ backgroundColor: bgColor }}>
+                {items.map(item => (
+                  <div
+                    key={item.name}
+                    style={{
+                      color: item.stocked ? 'black' : 'red',
+                      marginBottom: '5px'
+                    }}
+                  >
+                    {item.name} - {item.price}
+                    {!item.stocked && " (No disponible)"}
+                  </div>
+                ))}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
@@ -94,13 +120,12 @@ function Formulario() {
           name="cantidad"
           min="1"
           placeholder="Ingresa la cantidad"
-          required/>
+          required
+        />
 
         <label htmlFor="categoria">Categoría:</label>
         <select id="categoria" name="categoria" required>
-          <option value="" disabled>
-            Selecciona una...
-          </option>
+          <option value="" disabled>Selecciona una...</option>
           <option value="categoriaLacteos">Lácteos</option>
           <option value="categoriaCarnes">Carnes</option>
           <option value="categoriaVerduras">Verduras</option>
@@ -110,7 +135,7 @@ function Formulario() {
         </select>
         <button type="submit">Agregar Producto</button>
       </form>
-      <Animation/>
+      <Animation />
     </section>
   );
 }
@@ -138,7 +163,7 @@ const PRODUCTS = [
   { category: "Frutas", price: "$2", stocked: false, name: "Maracuyá" },
   { category: "Frutas", price: "$1", stocked: true, name: "Manzanas" },
   { category: "Panaderia", price: "$3", stocked: true, name: "Pan Integral" },
-  { category: "Bebidas", price: "$2", stocked: true, name: "Jugo de Naranja" },
+  { category: "Bebidas", price: "$2", stocked: true, name: "Jugo de Naranja" }
 ];
 
 export default function App() {
@@ -172,4 +197,3 @@ function Animation() {
     </section>
   );
 }
-

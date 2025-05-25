@@ -32,6 +32,7 @@ function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChang
 }
 
 function ProductTable({ products, filterText, inStockOnly }) {
+  // Agrupa los productos por categoría
   const groupedProducts = products.reduce((acc, product) => {
     if (
       product.name.toLowerCase().includes(filterText.toLowerCase()) &&
@@ -49,38 +50,37 @@ function ProductTable({ products, filterText, inStockOnly }) {
     <table className="product-table">
       <colgroup>
         <col className="col-30" />
-        <col className="col-70" />
+        <col className="col-50" />
+        <col className="col-20" />
       </colgroup>
       <thead>
         <tr>
           <th>Categoría</th>
-          <th>Productos y Precios</th>
+          <th>Producto</th>
+          <th>Precio</th>
         </tr>
       </thead>
       <tbody>
         {Object.entries(groupedProducts).map(([category, items]) => {
           const bgColor = categoryColors[category] || 'white';
-          return (
-            <tr key={category}>
-              <td className="categoria" style={{ backgroundColor: bgColor }}>
-                {category}
+          return items.map((item, index) => (
+            <tr key={`${category}-${item.name}`}>
+              {index === 0 ? (
+                <td className="categoria" style={{ backgroundColor: bgColor }}>
+                  {category}
+                </td>
+              ) : (
+                <td style={{ backgroundColor: bgColor }}></td>
+              )}
+              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
+                {item.name}
+                {!item.stocked && " (No disponible)"}
               </td>
-              <td style={{ backgroundColor: bgColor }}>
-                {items.map(item => (
-                  <div
-                    key={item.name}
-                    style={{
-                      color: item.stocked ? 'black' : 'red',
-                      marginBottom: '5px'
-                    }}
-                  >
-                    {item.name} - {item.price}
-                    {!item.stocked && " (No disponible)"}
-                  </div>
-                ))}
+              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
+                {item.price}
               </td>
             </tr>
-          );
+          ));
         })}
       </tbody>
     </table>
@@ -109,7 +109,7 @@ function Formulario() {
   return (
     <section className="section formulario">
       <h2>Agregar Producto</h2>
-      <form id="form-add-product" className='valy'>
+      <form id="form-add-product" className="valy">
         <label htmlFor="nombre">Producto:</label>
         <input type="text" id="nombre" required />
 

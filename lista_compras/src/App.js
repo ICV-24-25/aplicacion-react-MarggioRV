@@ -36,15 +36,12 @@ function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChang
 
 /*===ProductTable===*/
 function ProductTable({ products, filterText, inStockOnly }) {
-  // Agrupa los productos por categoría si coinciden con el filtro
   const groupedProducts = products.reduce((acc, product) => {
     if (
       product.name.toLowerCase().includes(filterText.toLowerCase()) &&
       (!inStockOnly || product.stocked)
     ) {
-      if (!acc[product.category]) {
-        acc[product.category] = [];
-      }
+      if (!acc[product.category]) acc[product.category] = [];
       acc[product.category].push(product);
     }
     return acc;
@@ -66,10 +63,9 @@ function ProductTable({ products, filterText, inStockOnly }) {
       </thead>
       <tbody>
         {Object.entries(groupedProducts).map(([category, items]) => {
-          const bgColor = categoryColors[category] || 'white'; // Color de fondo por categoría
+          const bgColor = categoryColors[category] || 'white';
           return items.map((item, index) => (
             <tr key={`${category}-${item.name}`}>
-              {/* Solo muestra el nombre de la categoría en la primera fila */}
               {index === 0 ? (
                 <td className="categoria" style={{ backgroundColor: bgColor }}>
                   {category}
@@ -77,12 +73,10 @@ function ProductTable({ products, filterText, inStockOnly }) {
               ) : (
                 <td style={{ backgroundColor: bgColor }}></td>
               )}
-              {/* Producto */}
               <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                 {item.name}
                 {!item.stocked && " (No disponible)"}
               </td>
-              {/* Precio */}
               <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                 {item.price}
               </td>
@@ -96,8 +90,8 @@ function ProductTable({ products, filterText, inStockOnly }) {
 
 /*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
-  const [filterText, setFilterText] = useState(''); // Texto de búsqueda
-  const [inStockOnly, setInStockOnly] = useState(false); // Checkbox de stock
+  const [filterText, setFilterText] = useState('');
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   return (
     <section className="section categorias" id="productosSection">
@@ -113,15 +107,50 @@ function FilterableProductTable({ products }) {
   );
 }
 
-/*===Formulario===*/
-function Formulario() {
+/*===Formulario (Cálculo y envío)===*/
+function Formulario({ products, onAgregarCompra }) {
+  const [nombre, setNombre] = useState('');
+  const [cantidad, setCantidad] = useState(1);
+
+  // Lógica cuando se envía el formulario
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const producto = products.find(p => p.name.toLowerCase() === nombre.toLowerCase());
+
+    if (!producto) {
+      alert('Producto no encontrado');
+      return;
+    }
+
+    const precioNumerico = parseFloat(producto.price.replace('$', ''));
+    const total = precioNumerico * cantidad;
+
+    // Llamamos a la función del padre para agregarlo a la lista
+    onAgregarCompra({
+      nombre: producto.name,
+      cantidad,
+      total: `$${total.toFixed(2)}`
+    });
+
+    // Limpiar el formulario
+    setNombre('');
+    setCantidad(1);
+  };
+
   return (
     <section className="section formulario">
       <h2>Agregar Producto</h2>
-      <form id="form-add-product" className="valy">
+      <form id="form-add-product" className="valy" onSubmit={handleSubmit}>
         {/* Nombre del producto */}
         <label htmlFor="nombre">Producto:</label>
-        <input type="text" id="nombre" required />
+        <input
+          type="text"
+          id="nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+        />
 
         {/* Cantidad */}
         <label htmlFor="cantidad">Cantidad:</label>
@@ -130,23 +159,11 @@ function Formulario() {
           id="cantidad"
           name="cantidad"
           min="1"
-          placeholder="Ingresa la cantidad"
+          value={cantidad}
+          onChange={(e) => setCantidad(Number(e.target.value))}
           required
         />
 
-        {/* Categoría */}
-        <label htmlFor="categoria">Categoría:</label>
-        <select id="categoria" name="categoria" required>
-          <option value="" disabled>Selecciona una...</option>
-          <option value="categoriaLacteos">Lácteos</option>
-          <option value="categoriaCarnes">Carnes</option>
-          <option value="categoriaVerduras">Verduras</option>
-          <option value="categoriaFrutas">Frutas</option>
-          <option value="categoriaPanaderia">Panadería</option>
-          <option value="categoriaBebidas">Bebidas</option>
-        </select>
-
-        {/* Botón de enviar */}
         <button type="submit">Agregar Producto</button>
       </form>
       <Animation />
@@ -154,20 +171,21 @@ function Formulario() {
   );
 }
 
-/*===Lista de Compras===*/
-function ListaCompras() {
+/*===Lista de Compras con items agregados===*/
+function ListaCompras({ compras }) {
   return (
     <section className="section shopping">
       <h2>Lista de Compras</h2>
       <ul className="shopping-list">
-        {/* Aquí se añadirán los productos de compra */}
-        <li></li>
+        {compras.map((item, index) => (
+          <li key={index}>
+            {item.nombre} - Cantidad: {item.cantidad} - Total: {item.total}
+          </li>
+        ))}
       </ul>
     </section>
   );
 }
-
-/*Bueno, aqui ibaa el array de los prodcuto, el cost*/
 
 /*===Animación===*/
 function Animation() {
@@ -192,9 +210,10 @@ function Animation() {
   );
 }
 
-/*===App Principal===*/
+/*===App Principal con estado de compras===*/
 export default function App() {
   const [products, setProducts] = useState([]);
+  const [compras, setCompras] = useState([]); // Lista de compras
 
   useEffect(() => {
     fetch('/productos.json')
@@ -206,11 +225,16 @@ export default function App() {
       .catch(error => console.error('Error al obtener los productos:', error));
   }, []);
 
+  // Agrega un producto a la lista de compras
+  const handleAgregarCompra = (item) => {
+    setCompras(prev => [...prev, item]);
+  };
+
   return (
     <div className="container-padre">
       <FilterableProductTable products={products} />
-      <Formulario />
-      <ListaCompras />
+      <Formulario products={products} onAgregarCompra={handleAgregarCompra} />
+      <ListaCompras compras={compras} />
     </div>
   );
 }

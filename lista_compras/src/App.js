@@ -328,12 +328,11 @@ function FilterableProductTable({ products }) {
         products={productosFiltrados}
         criterioOrden={criterioOrden}
         favoritos={favoritos}
-        onToggleFavorito={toggleFavorito}
-      />
+        onToggleFavorito={toggleFavorito}/>
     </section>
+    
   );
 }
-
 
 /*===Formulario (Cálculo y envío)===*/
 function Formulario({ products, onAgregarCompra }) {

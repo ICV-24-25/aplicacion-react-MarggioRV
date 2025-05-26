@@ -12,30 +12,49 @@ const categoryColors = {
 };
 
 /*===SearchBar===*/
-function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChange }) {
+function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChange, criterioOrden, onCriterioOrdenChange }) {
   return (
-    <form>
+    // Formulario con flexbox para alinear elementos horizontalmente
+    <form className="search-form">
       {/* Input de búsqueda */}
       <input
+        className="search-input"
         type="text"
         placeholder="Buscar..."
         value={filterText}
         onChange={e => onFilterTextChange(e.target.value)}
       />
+
       {/* Checkbox para mostrar solo productos en stock */}
-      <label>
+      <label style={{ marginLeft: '1em' }}>
         <input
           type="checkbox"
           checked={inStockOnly}
           onChange={e => onInStockChange(e.target.checked)}
-        /> Mostrar solo productos en stock
+        /> Mostrar en stock
       </label>
+
+      {/* Selector de orden al lado del checkbox */}
+      <label className="label-neon">
+        Ordenar por:{' '}
+        <select
+          id="sort-select"
+          className="select-neon"
+          value={criterioOrden}
+          onChange={e => onCriterioOrdenChange(e.target.value)}>
+          <option value="categoría">Categoría</option>
+          <option value="nombre">Nombre</option>
+          <option value="precio">Precio</option>
+        </select>
+      </label>
+
     </form>
   );
 }
 
 /*===ProductTable===*/
 function ProductTable({ products, criterioOrden }) {
+  // Agrupa los productos por categoría si el criterio es 'categoría'
   if (criterioOrden === 'categoría') {
     const groupedProducts = products.reduce((acc, product) => {
       if (!acc[product.category]) acc[product.category] = [];
@@ -62,6 +81,7 @@ function ProductTable({ products, criterioOrden }) {
             const bgColor = categoryColors[category] || 'white';
             return items.map((item, index) => (
               <tr key={`${category}-${item.name}`}>
+                {/* Solo muestra el nombre de la categoría en la primera fila */}
                 {index === 0 ? (
                   <td className="categoria" style={{ backgroundColor: bgColor }}>
                     {category}
@@ -69,10 +89,12 @@ function ProductTable({ products, criterioOrden }) {
                 ) : (
                   <td style={{ backgroundColor: bgColor }}></td>
                 )}
+                {/* Producto */}
                 <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                   {item.name}
                   {!item.stocked && " (No disponible)"}
                 </td>
+                {/* Precio */}
                 <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                   {item.price}
                 </td>
@@ -114,24 +136,26 @@ function ProductTable({ products, criterioOrden }) {
   );
 }
 
+/*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
-  const [filterText, setFilterText] = useState('');
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [criterioOrden, setCriterioOrden] = useState('categoría'); // Categoría, la opción, marcada por defecto
+  const [filterText, setFilterText] = useState(''); // Texto de búsqueda
+  const [inStockOnly, setInStockOnly] = useState(false); // Checkbox de stock
+  const [criterioOrden, setCriterioOrden] = useState('categoría'); // Criterio de orden
   const [categoriasVisibles, setCategoriasVisibles] = useState({}); // Control de visibilidad
 
   // Al cargar productos, activar todas las categorías
   useEffect(() => {
     const nuevasCategorias = [...new Set(products.map(p => p.category))];
     const estadoInicial = nuevasCategorias.reduce((acc, cat) => {
-      acc[cat] = true; // todas visibles por defecto
+      acc[cat] = true; // Todas visibles por defecto
       return acc;
     }, {});
     setCategoriasVisibles(estadoInicial);
-  }, [products]); // se ejecuta solo cuando los productos cambian
+  }, [products]);
 
-// Función para alternar visibilidad
-  const toggleCategoriaVisible = (categoria) => {setCategoriasVisibles(prev => ({
+  // Función para alternar visibilidad de cada categoría
+  const toggleCategoriaVisible = (categoria) => {
+    setCategoriasVisibles(prev => ({
       ...prev,
       [categoria]: !prev[categoria]
     }));
@@ -139,14 +163,14 @@ function FilterableProductTable({ products }) {
 
   const precioANumero = (precioStr) => parseFloat(precioStr.replace('$', ''));
 
-  // filtra si la categoría está visible.
+  // Aplicar filtros: búsqueda, stock, visibilidad
   let productosFiltrados = products.filter(product =>
     product.name.toLowerCase().includes(filterText.toLowerCase()) &&
     (!inStockOnly || product.stocked) &&
     categoriasVisibles[product.category]
   );
 
-   // Ordenamiento según...
+  // Aplicar orden según criterio seleccionado
   if (criterioOrden === 'nombre') {
     productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
   } else if (criterioOrden === 'precio') {
@@ -155,48 +179,52 @@ function FilterableProductTable({ products }) {
 
   const categoriasUnicas = [...new Set(products.map(p => p.category))];
 
+  // Reinicia todos los filtros al estado inicial
+  const resetearFiltros = () => {
+    setFilterText(''); // Limpiar texto búsqueda
+    setInStockOnly(false); // Desmarcar checkbox
+    setCriterioOrden('categoría'); // Restaurar orden por categoría
+    const categoriasIniciales = categoriasUnicas.reduce((acc, cat) => {
+      acc[cat] = true; // Mostrar todas
+      return acc;
+    }, {});
+    setCategoriasVisibles(categoriasIniciales);
+  };
+
   return (
     <section className="section categorias" id="productosSection">
       <h2>Productos</h2>
+
+      {/* Componente SearchBar con búsqueda, checkbox y select juntos */}
       <SearchBar
         filterText={filterText}
         inStockOnly={inStockOnly}
         onFilterTextChange={setFilterText}
         onInStockChange={setInStockOnly}
+        criterioOrden={criterioOrden}
+        onCriterioOrdenChange={setCriterioOrden}
       />
 
-      {/* Selector de orden */}
-      <label>
-        Ordenar por:{' '}
-        <select value={criterioOrden} onChange={e => setCriterioOrden(e.target.value)}>
-          <option value="categoría">Categoría</option>
-          <option value="nombre">Nombre</option>
-          <option value="precio">Precio</option>
-        </select>
-      </label>
-
-      {/* Botones para mostrar/ocultar categorías */}
-      <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+      {/* Botones de mostrar/ocultar por categoría */}
+      <section className='categorias-botones'>
         {categoriasUnicas.map(categoria => (
-          <button
+          <button 
             key={categoria}
-            style={{
-              marginRight: '8px',
-              backgroundColor: categoriasVisibles[categoria] ? '#4CAF50' : '#f44336',
-              color: 'white',
-              border: 'none',
-              padding: '5px 10px',
-              cursor: 'pointer',
-              borderRadius: '4px',
-            }}
+            className={`categoria-b ${categoriasVisibles[categoria] ? 'categoria-activa' : 'categoria-inactiva'}`}
             onClick={() => toggleCategoriaVisible(categoria)}
             type="button"
           >
             {categoriasVisibles[categoria] ? `Ocultar ${categoria}` : `Mostrar ${categoria}`}
           </button>
         ))}
-      </div>
+      </section>
 
+      {/* Botón para resetear filtros */}
+      <button className='Reset' onClick={resetearFiltros} type="button">
+        Restablecer filtros
+      </button>
+
+      {/* Tabla de productos filtrada y ordenada */}
       <ProductTable
         products={productosFiltrados}
         criterioOrden={criterioOrden}
@@ -204,7 +232,6 @@ function FilterableProductTable({ products }) {
     </section>
   );
 }
-
 
 /*===Formulario (Cálculo y envío)===*/
 function Formulario({ products, onAgregarCompra }) {

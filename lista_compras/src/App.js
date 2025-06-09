@@ -56,7 +56,6 @@ function SearchBar({
    title={filtrarFavoritos ? "Mostrar todos" : "Mostrar solo favoritos"}
    aria-label="Filtrar solo favoritos"/>
 
-
 </nav>);}
 
 /*===ProductTable===*/
@@ -182,19 +181,20 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                   transition: 'color 0.3s ease',
                 }}>
                 {item.name}
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleFavorito(item.name);
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-                  onMouseLeave={(e) => {
-                    if (!favoritos.includes(item.name)) e.currentTarget.style.opacity = 0;
-                  }}
-                  // Tooltip que indica la acción al usuario
-                  title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
-                  {favoritos.includes(item.name) ? '⭐' : '☆'}
-                </span>
+         
+         <span className="star" onClick={(e) => 
+         
+         { e.stopPropagation();
+            onToggleFavorito(item.name);}}
+          
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+            onMouseLeave={(e) => {
+          if (!favoritos.includes(item.name)) e.currentTarget.style.opacity = 0;}}
+
+          title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+          {favoritos.includes(item.name) ? '⭐' : '☆'}
+        </span>
+
               </td>
               <td style={{ color: item.stocked ? 'black' : 'red' }}>{item.price}</td>
             </tr>

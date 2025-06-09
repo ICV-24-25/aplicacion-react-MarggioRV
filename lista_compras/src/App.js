@@ -37,7 +37,7 @@ function SearchBar({
         <input
           type="checkbox"
           checked={inStockOnly}
-          onChange={e => onInStockChange(e.target.checked)}/> Mostrar en stock
+          onChange={e => onInStockChange(e.target.checked)}/> Solo en stock
       </label>
 
       <label className="label-neon" style={{ marginLeft: '1em' }}>

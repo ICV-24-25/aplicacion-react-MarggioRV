@@ -132,11 +132,11 @@
   background-color: #ffb347;
 }
 
-input[type="text"] {
-  padding: 0.5rem;
+.search input[type="text"] {
+  flex: 1 1 200px;
+  min-width: 150px;
+  padding: 0.4em 0.5em;
   font-size: 1rem;
-  width: 200px;
-  margin-right: 1rem;
 }
 
 .valy {
@@ -508,14 +508,25 @@ input[type="text"] {
 
 .search {
   display: flex;
-  align-items: center;
+  align-items: center; 
   gap: 1rem;
-  background:#26850e;
+  background: #26850e;
   padding: 1rem 2rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  border-radius: 10px;
+  border-radius: 15px;
   max-width: 800px;
-  margin: 2rem auto;}
+  margin: 2rem auto;
+}
+
+.search input[type="checkbox"],
+.search select,
+.estrella-icono {
+  line-height: 1.2;
+  vertical-align: middle;
+  margin: 0;
+  padding: 0.4em 0.5em;
+}
+
 
 /* Estrella del nav: animación suave y aspecto */
 .estrella-icono {

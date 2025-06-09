@@ -495,8 +495,7 @@ input[type="text"] {
 }
 
 .star.visible {
-  opacity: 1;
-}
+  opacity: 1;}
 
 .star:hover {
   opacity: 1;

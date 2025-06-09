@@ -180,7 +180,7 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                 }}>
                 {item.name}
          
-         <span classNameclassName={`star ${favoritos.includes(item.name) ? 'visible' : ''}`}
+         <span className={`star ${favoritos.includes(item.name) ? 'visible' : ''}`}
               onClick={(e) => {
               e.stopPropagation();
               onToggleFavorito(item.name);}}

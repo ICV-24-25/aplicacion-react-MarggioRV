@@ -180,16 +180,12 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                 }}>
                 {item.name}
          
-         <span className="star" onClick={(e) => 
-         
-         { e.stopPropagation();
-            onToggleFavorito(item.name);}}
-          
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-            onMouseLeave={(e) => {
-          if (!favoritos.includes(item.name)) e.currentTarget.style.opacity = 0;}}
-
-          title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+         <span classNameclassName={`star ${favoritos.includes(item.name) ? 'visible' : ''}`}
+              onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorito(item.name);}}
+              
+              title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
           {favoritos.includes(item.name) ? '⭐' : '☆'}
         </span>
 

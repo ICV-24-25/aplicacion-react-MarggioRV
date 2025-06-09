@@ -489,7 +489,6 @@ input[type="text"] {
   cursor: pointer;
   user-select: none;
   opacity: 0;
-  color: gray;
   transition: opacity 0.3s ease, color 0.3s ease;
   font-size: 1.2rem;
   display: inline-block;
@@ -499,25 +498,9 @@ input[type="text"] {
   opacity: 1;
 }
 
-.star.favorite {
-  color: gold;
-  opacity: 1;
-}
-
 .star:hover {
   opacity: 1;
   color: gold;
-}
-
-.star-select {
-  cursor: pointer;
-  font-size: 1.5rem;
-  margin-left: 1em;
-  user-select: none;
-  color: lightgray;
-  transition: color 0.3s;
-  vertical-align: middle;
-  display: inline-block;
 }
 
 .star-select.active {
@@ -539,7 +522,7 @@ input[type="text"] {
 .estrella-icono {
   cursor: pointer;
   font-size: 1.7rem;
-  color: #666;
+  color: goldenrod;
   transition: color 0.5s ease, transform 0.3s ease;
 }
 

@@ -78,9 +78,9 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
     return (<>
         <table className="product-table">
           <colgroup>
-            <col className="col-30" />
-            <col className="col-50" />
-            <col className="col-20" />
+            <col className="col-30"/>
+            <col className="col-50"/>
+            <col className="col-20"/>
           </colgroup>
           <thead>
             <tr>
@@ -131,10 +131,10 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                         title={
                           favoritos.includes(item.name)
                             ? 'Quitar de favoritos'
-                            : 'Agregar a favoritos'
-                        }>
+                            : 'Agregar a favoritos'}>
                         {favoritos.includes(item.name) ? '⭐' : '☆'}
                       </span>
+
                     </td>
                     <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                       {item.price}
@@ -149,9 +149,7 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
         <p style={{ marginTop: '1em', fontStyle: 'italic' }}>
           Mostrando {totalProductos} productos
         </p>
-      </>
-    );
-  }
+        </>);}
 
   // Tabla simple para otros criterios
   const totalProductos = products.length;
@@ -247,40 +245,23 @@ function FilterableProductTable({ products }) {
 
   // Toggle filtro favoritos: (des)activado
   const toggleFiltrarFavoritos = () => {
-    setFiltrarFavoritos((prev) => !prev);
-  };
+    setFiltrarFavoritos((prev) => !prev);};
 
   const precioANumero = (precioStr) => parseFloat(precioStr.replace('$', ''));
 
   // Aplicar filtros de texto, stock, categoría visibles, y si filtrar favoritos está activo
   let productosFiltrados = products.filter(product =>
-      product.name.toLowerCase().includes(filterText.toLowerCase()) &&
-      (!inStockOnly || product.stocked) &&
-      categoriasVisibles[product.category] &&
-      (!filtrarFavoritos || favoritos.includes(product.name))
-  );
+    product.name.toLowerCase().includes(filterText.toLowerCase()) &&
+    (!inStockOnly || product.stocked) &&
+    categoriasVisibles[product.category] &&
+    (!filtrarFavoritos || favoritos.includes(product.name)));
 
-  // Si filtro favoritos está activo y el criterio es nombre o precio, mostramos **todos los favoritos** sin importar categoría,
-  // pero ordenados según criterio
-  if (filtrarFavoritos && (criterioOrden === 'nombre' || criterioOrden === 'precio')) {
-    productosFiltrados = products.filter((product) => favoritos.includes(product.name));
-
-    if (criterioOrden === 'nombre') {
-      productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (criterioOrden === 'precio') {
-      productosFiltrados.sort(
-        (a, b) => precioANumero(a.price) - precioANumero(b.price)
-      );
-    }
-  } else {
-    // Orden normal
-    if (criterioOrden === 'nombre') {
-      productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (criterioOrden === 'precio') {
-      productosFiltrados.sort((a, b) => precioANumero(a.price) - precioANumero(b.price)
-      );
-    }
-  }
+// Ordenar según el criterio seleccionado (sea o no favoritos)
+  if (criterioOrden === 'nombre') {
+  productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));} 
+  else if (criterioOrden === 'precio') {
+  productosFiltrados.sort(
+    (a, b) => precioANumero(a.price) - precioANumero(b.price));}
 
   const categoriasUnicas = [...new Set(products.map((p) => p.category))];
 
@@ -363,8 +344,7 @@ function Formulario({ products, onAgregarCompra }) {
 
     if (!producto) {
       alert('Producto no encontrado');
-      return;
-    }
+      return;}
 
     const precioNumerico = parseFloat(producto.price.replace('$', ''));
     const total = precioNumerico * cantidad;
@@ -378,8 +358,7 @@ function Formulario({ products, onAgregarCompra }) {
 
     // Limpiar el formulario
     setNombre('');
-    setCantidad(1);
-  };
+    setCantidad(1);};
 
   return (
     <section className="section formulario">
@@ -431,7 +410,7 @@ function ListaCompras({ compras }) {
           </li>
         ))}
       </ul>
-      <hr />
+      <hr/>
       <section className="total-general">
         <strong>Total: ${totalGeneral.toFixed(2)}</strong>
       </section>

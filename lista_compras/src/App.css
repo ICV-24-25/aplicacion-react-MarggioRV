@@ -524,3 +524,27 @@ input[type="text"] {
   color: gold;
 }
 
+.search {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background:#26850e;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 10px;
+  max-width: 800px;
+  margin: 2rem auto;}
+
+/* Estrella del nav: animación suave y aspecto */
+.estrella-icono {
+  cursor: pointer;
+  font-size: 1.7rem;
+  color: #666;
+  transition: color 0.5s ease, transform 0.3s ease;
+}
+
+/* Al activarse: cambia color */
+.fa-solid.estrella-icono {
+  color: gold;
+  transform: scale(1.1);
+}

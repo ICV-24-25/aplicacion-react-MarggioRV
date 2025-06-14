@@ -101,7 +101,6 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                         className="categoria"
                         style={{
                           backgroundColor: bgColor,
-                          transition: 'background-color 0.3s ease',
                         }}>
                         {category}
                       </td>
@@ -112,20 +111,16 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                       style={{
                         backgroundColor: bgColor,
                         color: item.stocked ? 'black' : 'red',
-                        position: 'relative',
-                        cursor: 'default',
-                        transition: 'color 0.3s ease',
                       }}>
                       {item.name}
-                  {/* Span, ahi, la star*/}
-                  <span className='star'
-                        onClick={(e) => {
-                      e.stopPropagation(); // Evita que el click se propague a la fila o al padre
-                      onToggleFavorito(item.name); // Llama función para marcar/desmarcar favorito
+                      {/* Span, ahi, la star*/}
+                      <span className="star" onClick={(e) => {
+                          e.stopPropagation(); // Evita que el click se propague a la fila o al padre
+                          onToggleFavorito(item.name); // Llama función para marcar/desmarcar favorito
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
                         onMouseLeave={(e) => {
-                      // Al quitar el ratón, si el producto no es favorito, oculta la estrella
+                          // Al quitar el ratón, si el producto no es favorito, oculta la estrella
                           if (!favoritos.includes(item.name)) e.currentTarget.style.opacity = 0;
                         }}
                         title={
@@ -134,7 +129,6 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                             : 'Agregar a favoritos'}>
                         {favoritos.includes(item.name) ? '⭐' : '☆'}
                       </span>
-
                     </td>
                     <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                       {item.price}
@@ -149,7 +143,7 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
         <p style={{ marginTop: '1em', fontStyle: 'italic' }}>
           Mostrando {totalProductos} productos
         </p>
-        </>);}
+      </>);}
 
   // Tabla simple para otros criterios
   const totalProductos = products.length;
@@ -168,40 +162,32 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
           </tr>
         </thead>
         <tbody>
-        {/* Se productos sin agrupar */}
+          {/* Se productos sin agrupar */}
           {products.map((item) => (
             <tr key={item.name} style={{ backgroundColor: '#8A9597', transition: 'background-color 0.3s ease' }}>
               <td
                 style={{
-                color: item.stocked ? 'black' : 'red', // En caso de no estar en stock, el texto se vuelve rojo
-                  position: 'relative',
-                  cursor: 'default',
-                  transition: 'color 0.3s ease',
+                  color: item.stocked ? 'black' : 'red', // En caso de no estar en stock, el texto se vuelve rojo
                 }}>
                 {item.name}
-         
-         <span className={`star ${favoritos.includes(item.name) ? 'visible' : ''}`}
-              onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorito(item.name);}}
-              
-              title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
-          {favoritos.includes(item.name) ? '⭐' : '☆'}
-        </span>
 
+                <span className={`star ${favoritos.includes(item.name) ? 'visible' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorito(item.name);}}
+                  title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+                  {favoritos.includes(item.name) ? '⭐' : '☆'}
+                </span>
               </td>
               <td style={{ color: item.stocked ? 'black' : 'red' }}>{item.price}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p style={{ marginTop: '1em', fontStyle: 'italic' }}>
-        Mostrando {totalProductos} productos
-      </p>
+      <p style={{ marginTop: '1em', fontStyle: 'italic' }}>Mostrando {totalProductos} productos</p>
     </>
   );
 }
-
 
 /*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {

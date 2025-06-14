@@ -92,6 +92,7 @@
 .categoria {
   padding: 0.5em;
   border-bottom: 1px solid #ccc;
+  transition: background-color 0.3s ease; /* Es'suavizar el cambio de color */
 }
 
 /*
@@ -367,6 +368,7 @@
   border: 1px solid #ddd;
   padding: 0.5rem 1rem;
   text-align: left;
+  transition: color 0.3s ease;
 }
 
 .product-table thead {
@@ -494,8 +496,12 @@
   display: inline-block;
 }
 
+.product-name-cell:hover .star {
+  opacity: 1;
+}
+
 .star.visible {
-  opacity: 1;}
+  opacity: 1 !important;} /* modificador, se agrega para dar la máxima prioridad */
 
 .star:hover {
   opacity: 1;
@@ -541,3 +547,8 @@
   color: gold;
   transform: scale(1.1);
 }
+
+/* Celda en blanco, con fondo X categoría 
+.categoria-celda {
+  background-color: inherit;  Herencia de la primera celda 
+}*/

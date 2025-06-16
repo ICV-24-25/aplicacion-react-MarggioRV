@@ -460,8 +460,7 @@ function Formulario({ products, onAgregarCompra, onAgregarProducto }) {
               className="input-precio"
               value={precio}
               onChange={handlePrecioChange}  // Usamos la función personalizada para filtrar números
-              required
-            />
+              required/>
             <span className="euro-symbol">€</span> 
           </div>
 
@@ -471,8 +470,7 @@ function Formulario({ products, onAgregarCompra, onAgregarProducto }) {
             className="input-categoria"
             value={categoria}
             onChange={(e) => setCategoria(e.target.value)}
-            required
-          >
+            required>
             <option value="">Seleccione una categoría</option>
             <option value="Lácteos">Lácteos</option>
             <option value="Carnes">Carnes</option>

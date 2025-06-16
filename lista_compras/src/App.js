@@ -1,15 +1,28 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
+// Diccionario: Colores x categoría 
+const categoryColors = {
+  'Lácteos': '#87CEEB',
+  'Carnes': '#E75480',
+  'Verduras': '#88E788',
+  'Frutas': '#32CD32',
+  'Panadería': '#fce5cd',
+  'Bebidas': '#00AAE4'
+};
+
+/*===SearchBar===*/
 function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChange }) {
   return (
     <form>
+      {/* Input de búsqueda */}
       <input
         type="text"
         placeholder="Buscar..."
         value={filterText}
         onChange={e => onFilterTextChange(e.target.value)}
       />
+      {/* Checkbox para mostrar solo productos en stock */}
       <label>
         <input
           type="checkbox"
@@ -21,45 +34,61 @@ function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChang
   );
 }
 
+/*===ProductTable===*/
 function ProductTable({ products, filterText, inStockOnly }) {
   const groupedProducts = products.reduce((acc, product) => {
     if (
       product.name.toLowerCase().includes(filterText.toLowerCase()) &&
       (!inStockOnly || product.stocked)
     ) {
-      if (!acc[product.category]) {
-        acc[product.category] = [];
-      }
+      if (!acc[product.category]) acc[product.category] = [];
       acc[product.category].push(product);
     }
     return acc;
   }, {});
 
   return (
-    <>
-      {Object.entries(groupedProducts).map(([category, items]) => (
-        <div
-          key={category}
-          className="categoria"
-          id={`categoria${category}`}
-        >
-          <h4>{category}</h4>
-          <ul id={`categoria${category}List`}>
-            {items.map(item => (
-              <li key={item.name}>
-                <article>
-                  {item.name} - {item.price}
-                  {!item.stocked && " (No disponible)"}
-                </article>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </>
+    <table className="product-table">
+      <colgroup>
+        <col className="col-30" />
+        <col className="col-50" />
+        <col className="col-20" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Producto</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.entries(groupedProducts).map(([category, items]) => {
+          const bgColor = categoryColors[category] || 'white';
+          return items.map((item, index) => (
+            <tr key={`${category}-${item.name}`}>
+              {index === 0 ? (
+                <td className="categoria" style={{ backgroundColor: bgColor }}>
+                  {category}
+                </td>
+              ) : (
+                <td style={{ backgroundColor: bgColor }}></td>
+              )}
+              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
+                {item.name}
+                {!item.stocked && " (No disponible)"}
+              </td>
+              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
+                {item.price}
+              </td>
+            </tr>
+          ));
+        })}
+      </tbody>
+    </table>
   );
 }
 
+/*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
   const [filterText, setFilterText] = useState('');
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -78,78 +107,99 @@ function FilterableProductTable({ products }) {
   );
 }
 
-function Formulario() {
+/*===Formulario (Cálculo y envío)===*/
+function Formulario({ products, onAgregarCompra }) {
+  const [nombre, setNombre] = useState('');
+  const [cantidad, setCantidad] = useState(1);
+
+  // Lógica cuando se envía el formulario
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const producto = products.find(p => p.name.toLowerCase() === nombre.toLowerCase());
+
+    if (!producto) {
+      alert('Producto no encontrado');
+      return;
+    }
+
+    const precioNumerico = parseFloat(producto.price.replace('$', ''));
+    const total = precioNumerico * cantidad;
+
+    // Llamamos a la función del padre para agregarlo a la lista
+    onAgregarCompra({
+      nombre: producto.name,
+      cantidad,
+      total: `$${total.toFixed(2)}`
+    });
+
+    // Limpiar el formulario
+    setNombre('');
+    setCantidad(1);
+  };
+
   return (
     <section className="section formulario">
       <h2>Agregar Producto</h2>
-      <form id="form-add-product" className='valy'>
+      <form id="form-add-product" className="valy" onSubmit={handleSubmit}>
+        {/* Nombre del producto */}
         <label htmlFor="nombre">Producto:</label>
-        <input type="text" id="nombre" required />
+        <input
+          type="text"
+          id="nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
+        />
 
+        {/* Cantidad */}
         <label htmlFor="cantidad">Cantidad:</label>
         <input
           type="number"
           id="cantidad"
           name="cantidad"
           min="1"
-          placeholder="Ingresa la cantidad"
-          required/>
+          value={cantidad}
+          onChange={(e) => setCantidad(Number(e.target.value))}
+          required
+        />
 
-        <label htmlFor="categoria">Categoría:</label>
-        <select id="categoria" name="categoria" required>
-          <option value="" disabled>
-            Selecciona una...
-          </option>
-          <option value="categoriaLacteos">Lácteos</option>
-          <option value="categoriaCarnes">Carnes</option>
-          <option value="categoriaVerduras">Verduras</option>
-          <option value="categoriaFrutas">Frutas</option>
-          <option value="categoriaPanaderia">Panadería</option>
-          <option value="categoriaBebidas">Bebidas</option>
-        </select>
         <button type="submit">Agregar Producto</button>
       </form>
-      <Animation/>
+      <Animation />
     </section>
   );
 }
 
-function ListaCompras() {
+/*===Lista de Compras con items agregados===*/
+function ListaCompras({ compras }) {
+  // Calcular total general
+  const totalGeneral = compras.reduce((acc, item) => {
+    const num = parseFloat(item.total.replace('$', ''));
+    return acc + num;
+  }, 0);
+
   return (
     <section className="section shopping">
       <h2>Lista de Compras</h2>
       <ul className="shopping-list">
-        <li>Producto A - 2 unidades</li>
+        {compras.map((item, index) => (
+          <li className="compra-item" key={index}>
+            <span className="producto">{item.nombre}</span>
+            <span className="cantidad">Cantidad: {item.cantidad}</span>
+            <span className="total">Total: {item.total}</span>
+          </li>
+        ))}
       </ul>
+      <hr />
+      <section className="total-general">
+        <strong>Total: ${totalGeneral.toFixed(2)}</strong>
+      </section>
     </section>
   );
 }
 
-const PRODUCTS = [
-  { category: "Lacteos", price: "$2", stocked: true, name: "Leche" },
-  { category: "Carnes", price: "$5", stocked: true, name: "Pollo" },
-  { category: "Verduras", price: "$2", stocked: true, name: "Zanahorias" },
-  { category: "Verduras", price: "$2", stocked: true, name: "Espinaca" },
-  { category: "Verduras", price: "$4", stocked: false, name: "Calabaza" },
-  { category: "Verduras", price: "$1", stocked: true, name: "Guisantes" },
-  { category: "Frutas", price: "$1", stocked: true, name: "Manzana" },
-  { category: "Frutas", price: "$1", stocked: true, name: "Fruta del dragón" },
-  { category: "Frutas", price: "$2", stocked: false, name: "Maracuyá" },
-  { category: "Frutas", price: "$1", stocked: true, name: "Manzanas" },
-  { category: "Panaderia", price: "$3", stocked: true, name: "Pan Integral" },
-  { category: "Bebidas", price: "$2", stocked: true, name: "Jugo de Naranja" },
-];
-
-export default function App() {
-  return (
-    <div className="container-padre">
-      <FilterableProductTable products={PRODUCTS} />
-      <Formulario />
-      <ListaCompras />
-    </div>
-  );
-}
-
+/*===Animación===*/
 function Animation() {
   return (
     <section className="cont">
@@ -172,3 +222,31 @@ function Animation() {
   );
 }
 
+/*===App Principal con estado de compras===*/
+export default function App() {
+  const [products, setProducts] = useState([]);
+  const [compras, setCompras] = useState([]); // Lista de compras
+
+  useEffect(() => {
+    fetch('/productos.json')
+      .then(response => {
+        if (!response.ok) throw new Error('Error al cargar los productos');
+        return response.json();
+      })
+      .then(data => setProducts(data))
+      .catch(error => console.error('Error al obtener los productos:', error));
+  }, []);
+
+  // Agrega un producto a la lista de compras
+  const handleAgregarCompra = (item) => {
+    setCompras(prev => [...prev, item]);
+  };
+
+  return (
+    <div className="container-padre">
+      <FilterableProductTable products={products} />
+      <Formulario products={products} onAgregarCompra={handleAgregarCompra} />
+      <ListaCompras compras={compras} />
+    </div>
+  );
+}

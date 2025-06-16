@@ -1,4 +1,3 @@
-/* Reset básico */
 * {
   margin: 0;
   padding: 0;
@@ -24,7 +23,7 @@
   }
 }
 
-/* Estilos generales de sección */
+/* Estilos generales de sección ron ron*/
 .section {
   padding: 1em;
   border-radius: 5px;
@@ -52,13 +51,41 @@
 
 /* Lista de compras */
 .shopping-list {
-  list-style: none;
-  padding-left: 0;
+  list-style-type: none;
+  padding: 0;
 }
 
-.shopping-list li {
+.compra-item {
   padding: 0.5em;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compra-item span {
+  flex: 1;
+  text-align: left;
+}
+
+.producto {
+  min-width: 100px;
+}
+
+.cantidad {
+  text-align: center;
+  min-width: 150px;
+}
+
+.total {
+  text-align: right;
+  min-width: 120px;
+}
+
+.total-general {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 1.2em;
 }
 
 /* Estilo de categoría */
@@ -67,10 +94,11 @@
   border-bottom: 1px solid #ccc;
 }
 
+/*
 .categoria ul {
   list-style: none;
   padding-left: 0;
-}
+}*/
 
 /* Formulario */
 .formulario form {
@@ -116,10 +144,7 @@ input[type="text"] {
   margin-bottom: 3em;
 }
 
-/*.out-of-stock {
-  color: red;
-  font-style: italic;
-}*/
+/*Ant*Card*/
 
 .cont {
   width: max-content;       
@@ -328,3 +353,44 @@ input[type="text"] {
     transform: translateY(0);
   }
 }
+
+/*=== Tabla ===*/
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  table-layout: fixed;
+}
+
+.product-table th,
+.product-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  text-align: left;
+}
+
+.product-table thead {
+  background-color: #f0f0f0;
+}
+
+.col-30 {
+  width: 20%;
+}
+
+.col-20 {
+  width: 20%;
+}
+
+/* 
+.categoria {
+  font-weight: bold;
+  vertical-align: top;
+}*/
+
+/* Para productos sin stock */
+.out-of-stock-item {
+  color: red;
+  font-style: italic;
+}
+
+/*=== Impresión ===*/

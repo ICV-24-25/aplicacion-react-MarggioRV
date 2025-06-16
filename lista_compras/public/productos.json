@@ -1,0 +1,73 @@
+[
+  { 
+    "category": "Lácteos", 
+    "price": "$2", 
+    "stocked": true, 
+    "name": "Leche" },
+
+  { 
+    "category": "Carnes", 
+    "price": "$5", 
+    "stocked": true, 
+    "name": "Pollo" },
+
+  { 
+    "category": "Verduras", 
+    "price": "$2", 
+    "stocked": true, 
+    "name": "Zanahorias" },
+
+  { 
+    "category": "Verduras", 
+    "price": "$2", 
+    "stocked": true, 
+    "name": "Espinaca" },
+
+  { 
+    "category": "Verduras",
+     "price": "$1", 
+     "stocked": true, 
+     "name": "Guisantes" },
+
+  { 
+    "category": "Verduras", 
+    "price": "$4", 
+    "stocked": false, 
+    "name": "Calabaza" },
+
+  { 
+    "category": "Frutas", 
+    "price": "$1", 
+    "stocked": true, 
+    "name": "Manzana" },
+
+  { 
+    "category": "Frutas", 
+    "price": "$1", 
+    "stocked": true, 
+    "name": "Fruta del dragón" },
+
+  { 
+   "category": "Frutas", 
+   "price": "$1", 
+   "stocked": true, 
+   "name": "Manzanas" },
+
+  { 
+   "category": "Frutas", 
+   "price": "$2", 
+   "stocked": false, 
+   "name": "Maracuyá" },
+
+  { 
+   "category": "Panadería", 
+   "price": "$3", 
+   "stocked": true, 
+   "name": "Pan Integral" },
+
+  { 
+   "category": "Bebidas", 
+   "price": "$2", 
+   "stocked": true, 
+   "name": "Jugo de Naranja" }
+]

@@ -1,0 +1,20 @@
+
+└── node_modules
+└── public
+├──favicon.icon
+├──index
+├──productos.json
+├──logo192.png
+├──manifest.jason
+├──robots.txt
+└── src
+├──App.css
+├──App.js
+├──App.test.js
+├──index.css
+├──index.js
+├──logo.svg
+├──reportWebVitals.js
+├──setupTests.js
+└── package-lock.json
+└──  package.j-son

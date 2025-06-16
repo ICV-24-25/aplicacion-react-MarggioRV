@@ -12,77 +12,192 @@ const categoryColors = {
 };
 
 /*===SearchBar===*/
-function SearchBar({ filterText, inStockOnly, onFilterTextChange, onInStockChange }) {
+function SearchBar({
+  filterText,
+  inStockOnly,
+  onFilterTextChange,
+  onInStockChange,
+  criterioOrden,
+  onCriterioOrdenChange,
+  filtrarFavoritos,
+  onFiltrarFavoritosChange
+}) {
   return (
-    <form>
-      {/* Input de búsqueda */}
+    <form className="search-form">
       <input
+        className="search-input"
         type="text"
         placeholder="Buscar..."
         value={filterText}
         onChange={e => onFilterTextChange(e.target.value)}
       />
-      {/* Checkbox para mostrar solo productos en stock */}
-      <label>
+
+      <label style={{ marginLeft: '1em' }}>
         <input
           type="checkbox"
           checked={inStockOnly}
           onChange={e => onInStockChange(e.target.checked)}
-        /> Mostrar solo productos en stock
+        /> Mostrar en stock
       </label>
+
+      <label className="label-neon" style={{ marginLeft: '1em' }}>
+        Ordenar por:{' '}
+        <select
+          id="sort-select"
+          className="select-neon"
+          value={criterioOrden}
+          onChange={e => onCriterioOrdenChange(e.target.value)}
+        >
+          <option value="categoría">Categoría</option>
+          <option value="nombre">Nombre</option>
+          <option value="precio">Precio</option>
+        </select>
+      </label>
+
+      {/* Estrella para filtrar favoritos */}
+<span
+  className={`star-select ${filtrarFavoritos ? 'active' : ''}`}
+  onClick={onFiltrarFavoritosChange}
+  title={filtrarFavoritos ? "Mostrar todos" : "Mostrar solo favoritos"}
+  aria-label="Filtrar solo favoritos">
+  {filtrarFavoritos ? '⭐' : '☆'}
+</span>
     </form>
   );
 }
 
+
+
 /*===ProductTable===*/
-function ProductTable({ products, filterText, inStockOnly }) {
-  const groupedProducts = products.reduce((acc, product) => {
-    if (
-      product.name.toLowerCase().includes(filterText.toLowerCase()) &&
-      (!inStockOnly || product.stocked)
-    ) {
+/*Comportamiento:
+ * - Para cada producto, el nombre aparece junto con una estrella "☆" invisible por defecto.
+ * - Al pasar el ratón sobre la estrella, esta se hace visible.
+ * - Al hacer click en la estrella, se activa/desactiva el favorito, cambiando la estrella a "⭐".
+ */
+function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) {
+  // Si el criterio es 'categoría', agrupamos los productos por su categoría
+  if (criterioOrden === 'categoría') {
+    // Agrupación: crea un objeto con claves como categorías y valores como arrays de productos
+    const groupedProducts = products.reduce((acc, product) => {
       if (!acc[product.category]) acc[product.category] = [];
       acc[product.category].push(product);
-    }
-    return acc;
-  }, {});
+      return acc;
+    }, {});
 
+    return (
+      <table className="product-table">
+        <colgroup>
+          <col className="col-30"/>
+          <col className="col-50"/>
+          <col className="col-20"/>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Producto</th>
+            <th>Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(groupedProducts).map(([category, items]) => {
+            // Color de fondo, es correspondiente a la categoría 
+            const bgColor = categoryColors[category] || 'white';
+
+            // Se renderiza cada producto 
+            return items.map((item, index) => (
+              <tr key={`${category}-${item.name}`}>
+                {/* Solo se ve el nombre de la categoría en la primera*/}
+                {index === 0 ? (
+                  <td className="categoria" style={{ backgroundColor: bgColor }}>
+                    {category}
+                  </td>
+                ) : (
+                  <td style={{ backgroundColor: bgColor }}></td>
+                )}
+                
+                <td
+                  style={{
+                    backgroundColor: bgColor,
+                    color: item.stocked ? 'black' : 'red', // Rojo si no hay stock
+                    position: 'relative', // Para posicionar la estrella si fuera necesario
+                    cursor: 'default', // Cursor normal
+                  }}>
+
+                  {item.name}
+                  {/* Span, ahi, la star*/}
+                  <span className='star'
+                    onClick={(e) => {
+                      e.stopPropagation(); // Evita que el click se propague a la fila o al padre
+                      onToggleFavorito(item.name); // Llama función para marcar/desmarcar favorito
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)} // Al pasar ratón, muestra estrella
+                    onMouseLeave={(e) => {
+                      // Al quitar el ratón, si el producto no es favorito, oculta la estrella
+                      if (!favoritos.includes(item.name)) e.currentTarget.style.opacity = 0;
+                    }}
+                
+                    // Tooltip que indica la acción al usuario
+                    title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+                    {/* Muestra estrella llena si es favorito, vacía si no */}
+                    {favoritos.includes(item.name) ? '⭐' : '☆'}
+                  </span>
+                </td>
+
+                {/* Celda del precio */}
+                <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
+                  {item.price}
+                </td>
+              </tr>
+            ));
+          })}
+        </tbody>
+      </table>
+    );
+  }
+
+  // Si no se agrupan por categoría, renderizamos tabla simple sin agrupación
   return (
     <table className="product-table">
       <colgroup>
-        <col className="col-30" />
-        <col className="col-50" />
-        <col className="col-20" />
+        <col className="col-50"/>
+        <col className="col-50"/>
       </colgroup>
       <thead>
         <tr>
-          <th>Categoría</th>
           <th>Producto</th>
           <th>Precio</th>
         </tr>
       </thead>
       <tbody>
-        {Object.entries(groupedProducts).map(([category, items]) => {
-          const bgColor = categoryColors[category] || 'white';
-          return items.map((item, index) => (
-            <tr key={`${category}-${item.name}`}>
-              {index === 0 ? (
-                <td className="categoria" style={{ backgroundColor: bgColor }}>
-                  {category}
-                </td>
-              ) : (
-                <td style={{ backgroundColor: bgColor }}></td>
-              )}
-              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
-                {item.name}
-                {!item.stocked && " (No disponible)"}
-              </td>
-              <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
-                {item.price}
-              </td>
-            </tr>
-          ));
-        })}
+        {/* Iteramos productos sin agrupar */}
+        {products.map((item) => (
+          <tr key={item.name} style={{ backgroundColor: '#8A9597' }}>
+            <td
+              style={{
+                color: item.stocked ? 'black' : 'red', // Texto rojo si no hay stock
+                position: 'relative',
+                cursor: 'default',
+              }}>
+
+              {item.name}
+              {/* Estrella de favorito igual que en tabla agrupada */}
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorito(item.name);
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+                onMouseLeave={(e) => {
+                  if (!favoritos.includes(item.name)) e.currentTarget.style.opacity = 0;
+                }}
+
+                title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+                {favoritos.includes(item.name) ? '⭐' : '☆'}
+              </span>
+            </td>
+            <td style={{ color: item.stocked ? 'black' : 'red' }}>{item.price}</td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );
@@ -90,22 +205,135 @@ function ProductTable({ products, filterText, inStockOnly }) {
 
 /*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
-  const [filterText, setFilterText] = useState('');
-  const [inStockOnly, setInStockOnly] = useState(false);
+  const [filterText, setFilterText] = useState(''); // Texto de búsqueda
+  const [inStockOnly, setInStockOnly] = useState(false); // Checkbox de stock
+  const [criterioOrden, setCriterioOrden] = useState('categoría'); // Criterio de orden
+  const [categoriasVisibles, setCategoriasVisibles] = useState({}); // Control de visibilidad
+  const [favoritos, setFavoritos] = useState([]); // Array nombres favoritos
+  const [filtrarFavoritos, setFiltrarFavoritos] = useState(false); // Filtro por favoritos
+
+  // Al cargar productos, activar todas las categorías
+  useEffect(() => {
+    const nuevasCategorias = [...new Set(products.map(p => p.category))];
+    const estadoInicial = nuevasCategorias.reduce((acc, cat) => {
+      acc[cat] = true; // Todas visibles por defecto
+      return acc;
+    }, {});
+    setCategoriasVisibles(estadoInicial);
+  }, [products]);
+
+  // Toggle visibilidad de categoría
+  const toggleCategoriaVisible = (categoria) => {
+    setCategoriasVisibles(prev => ({
+      ...prev,
+      [categoria]: !prev[categoria]
+    }));
+  };
+
+  // Toggle producto favorito
+  const toggleFavorito = (nombreProducto) => {
+    setFavoritos(prev =>
+      prev.includes(nombreProducto)
+        ? prev.filter(n => n !== nombreProducto)
+        : [...prev, nombreProducto]
+    );
+  };
+
+  // Toggle filtro favoritos activado/desactivado
+  const toggleFiltrarFavoritos = () => {
+    setFiltrarFavoritos(prev => !prev);
+  };
+
+  const precioANumero = (precioStr) => parseFloat(precioStr.replace('$', ''));
+
+  // Aplicar filtros de texto, stock, categoría visibles, y si filtrar favoritos está activo
+  let productosFiltrados = products.filter(product =>
+    product.name.toLowerCase().includes(filterText.toLowerCase()) &&
+    (!inStockOnly || product.stocked) &&
+    categoriasVisibles[product.category] &&
+    (!filtrarFavoritos || favoritos.includes(product.name))
+  );
+
+  // Si filtro favoritos está activo y el criterio es nombre o precio, mostramos **todos los favoritos** sin importar categoría,
+  // pero ordenados según criterio
+  if (filtrarFavoritos && (criterioOrden === 'nombre' || criterioOrden === 'precio')) {
+    productosFiltrados = products.filter(product => favoritos.includes(product.name));
+
+    if (criterioOrden === 'nombre') {
+      productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (criterioOrden === 'precio') {
+      productosFiltrados.sort((a, b) => precioANumero(a.price) - precioANumero(b.price));
+    }
+  } else {
+    // Orden normal
+    if (criterioOrden === 'nombre') {
+      productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (criterioOrden === 'precio') {
+      productosFiltrados.sort((a, b) => precioANumero(a.price) - precioANumero(b.price));
+    }
+  }
+
+  const categoriasUnicas = [...new Set(products.map(p => p.category))];
+
+  // Reinicia todos los filtros al estado inicial
+  const resetearFiltros = () => {
+    setFilterText('');
+    setInStockOnly(false);
+    setCriterioOrden('categoría');
+    setFiltrarFavoritos(false);
+    const categoriasIniciales = categoriasUnicas.reduce((acc, cat) => {
+      acc[cat] = true;
+      return acc;
+    }, {});
+    setCategoriasVisibles(categoriasIniciales);
+    setFavoritos([]); // Opcional: si quieres resetear favoritos al resetear filtros
+  };
 
   return (
     <section className="section categorias" id="productosSection">
       <h2>Productos</h2>
+
+      {/* SearchBar recibe el estado y handler para filtrar favoritos */}
       <SearchBar
         filterText={filterText}
         inStockOnly={inStockOnly}
         onFilterTextChange={setFilterText}
         onInStockChange={setInStockOnly}
+        criterioOrden={criterioOrden}
+        onCriterioOrdenChange={setCriterioOrden}
+        filtrarFavoritos={filtrarFavoritos}
+        onFiltrarFavoritosChange={toggleFiltrarFavoritos}
       />
-      <ProductTable products={products} filterText={filterText} inStockOnly={inStockOnly} />
+
+      {/* Botones para mostrar/ocultar categorías */}
+      <section className='categorias-botones'>
+        {categoriasUnicas.map(categoria => (
+          <button
+            key={categoria}
+            className={`categoria-b ${categoriasVisibles[categoria] ? 'categoria-activa' : 'categoria-inactiva'}`}
+            onClick={() => toggleCategoriaVisible(categoria)}
+            type="button"
+          >
+            {categoriasVisibles[categoria] ? `Ocultar ${categoria}` : `Mostrar ${categoria}`}
+          </button>
+        ))}
+      </section>
+
+      <button className='Reset' onClick={resetearFiltros} type="button">
+        Restablecer filtros
+      </button>
+
+      {/* Pasamos toggleFavorito y favoritos a ProductTable para controlar estrellas */}
+      <ProductTable
+        products={productosFiltrados}
+        criterioOrden={criterioOrden}
+        favoritos={favoritos}
+        onToggleFavorito={toggleFavorito}
+      />
     </section>
   );
 }
+
 
 /*===Formulario (Cálculo y envío)===*/
 function Formulario({ products, onAgregarCompra }) {
@@ -126,7 +354,7 @@ function Formulario({ products, onAgregarCompra }) {
     const precioNumerico = parseFloat(producto.price.replace('$', ''));
     const total = precioNumerico * cantidad;
 
-    // Llamamos a la función del padre para agregarlo a la lista
+    // Llama a la función del padre para agregarlo a la lista
     onAgregarCompra({
       nombre: producto.name,
       cantidad,

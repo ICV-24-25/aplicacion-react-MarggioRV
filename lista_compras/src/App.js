@@ -58,6 +58,11 @@ function SearchBar({
 
 </nav>);}
 
+/*===ProductTable===*/
+
+/* La nueva estrella se verá junto al name, "☆", siendo invisble hasta pasar el ratón. 
+Su estado activado "⭐" */
+
 function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) {
   // Si el criterio es 'categoría', agrupamos los productos por su categoría
   if (criterioOrden === 'categoría') {
@@ -95,7 +100,8 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                       <td
                         className="categoria"
                         style={{
-                          backgroundColor: bgColor,
+                          backgroundColor: categoryColors[category] || 'white',
+                          transition: 'background-color 0.3s ease',
                         }}>
                         {category}
                       </td>
@@ -106,16 +112,20 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                       style={{
                         backgroundColor: bgColor,
                         color: item.stocked ? 'black' : 'red',
+                        position: 'relative',
+                        cursor: 'default',
+                        transition: 'color 0.3s ease',
                       }}>
                       {item.name}
-                      {/* Span, ahi, la star*/}
-                      <span className="star" onClick={(e) => {
-                          e.stopPropagation(); // Evita que el click se propague a la fila o al padre
-                          onToggleFavorito(item.name); // Llama función para marcar/desmarcar favorito
+                  {/* Span, ahi, la star*/}
+                  <span className='star'
+                        onClick={(e) => {
+                      e.stopPropagation(); // Evita que el click se propague a la fila o al padre
+                      onToggleFavorito(item.name); // Llama función para marcar/desmarcar favorito
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
                         onMouseLeave={(e) => {
-                          // Al quitar el ratón, si el producto no es favorito, oculta la estrella
+                      // Al quitar el ratón, si el producto no es favorito, oculta la estrella
                           if (!favoritos.includes(item.name)) e.currentTarget.style.opacity = 0;
                         }}
                         title={
@@ -124,6 +134,7 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
                             : 'Agregar a favoritos'}>
                         {favoritos.includes(item.name) ? '⭐' : '☆'}
                       </span>
+
                     </td>
                     <td style={{ backgroundColor: bgColor, color: item.stocked ? 'black' : 'red' }}>
                       {item.price}
@@ -138,7 +149,7 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
         <p style={{ marginTop: '1em', fontStyle: 'italic' }}>
           Mostrando {totalProductos} productos
         </p>
-      </>);}
+        </>);}
 
   // Tabla simple para otros criterios
   const totalProductos = products.length;
@@ -157,29 +168,36 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
           </tr>
         </thead>
         <tbody>
-          {/* Se productos sin agrupar */}
+        {/* Se productos sin agrupar */}
           {products.map((item) => (
             <tr key={item.name} style={{ backgroundColor: '#8A9597', transition: 'background-color 0.3s ease' }}>
               <td
                 style={{
-                  color: item.stocked ? 'black' : 'red', // En caso de no estar en stock, el texto se vuelve rojo
+                color: item.stocked ? 'black' : 'red', // En caso de no estar en stock, el texto se vuelve rojo
+                  position: 'relative',
+                  cursor: 'default',
+                  transition: 'color 0.3s ease',
                 }}>
                 {item.name}
+         
+         <span className={`star ${favoritos.includes(item.name) ? 'visible' : ''}`}
+              onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorito(item.name);}}
+              
+              title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
+          {favoritos.includes(item.name) ? '⭐' : '☆'}
+        </span>
 
-                <span className={`star ${favoritos.includes(item.name) ? 'visible' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleFavorito(item.name);}}
-                  title={favoritos.includes(item.name) ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
-                  {favoritos.includes(item.name) ? '⭐' : '☆'}
-                </span>
               </td>
               <td style={{ color: item.stocked ? 'black' : 'red' }}>{item.price}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p style={{ marginTop: '1em', fontStyle: 'italic' }}>Mostrando {totalProductos} productos</p>
+      <p style={{ marginTop: '1em', fontStyle: 'italic' }}>
+        Mostrando {totalProductos} productos
+      </p>
     </>
   );
 }
@@ -193,7 +211,6 @@ function FilterableProductTable({ products }) {
   const [categoriasVisibles, setCategoriasVisibles] = useState({}); // Control de visibilidad
   const [favoritos, setFavoritos] = useState([]); // Array nombres favoritos
   const [filtrarFavoritos, setFiltrarFavoritos] = useState(false); // Filtro por favoritos
-  const [animating, setAnimating] = useState(false); // Estado de animación
 
   // Al cargar productos, activar todas las categorías
   useEffect(() => {
@@ -204,12 +221,6 @@ function FilterableProductTable({ products }) {
     }, {});
     setCategoriasVisibles(estadoInicial);
   }, [products]);
-
-  // Detectar cambios en los filtros y activar la animación
-  useEffect(() => {
-    setAnimating(true);
-    setTimeout(() => setAnimating(false), 300); // Duración de la animación
-  }, [filterText, inStockOnly, criterioOrden, categoriasVisibles, favoritos, filtrarFavoritos]);
 
   // Toggle visibilidad de categoría
   const toggleCategoriaVisible = (categoria) => {
@@ -230,8 +241,7 @@ function FilterableProductTable({ products }) {
 
   // Toggle filtro favoritos: (des)activado
   const toggleFiltrarFavoritos = () => {
-    setFiltrarFavoritos((prev) => !prev);
-  };
+    setFiltrarFavoritos((prev) => !prev);};
 
   const precioANumero = (precioStr) => parseFloat(precioStr.replace('$', ''));
 
@@ -240,17 +250,14 @@ function FilterableProductTable({ products }) {
     product.name.toLowerCase().includes(filterText.toLowerCase()) &&
     (!inStockOnly || product.stocked) &&
     categoriasVisibles[product.category] &&
-    (!filtrarFavoritos || favoritos.includes(product.name))
-  );
+    (!filtrarFavoritos || favoritos.includes(product.name)));
 
-  // Ordenar según el criterio seleccionado (sea o no favoritos)
+// Ordenar según el criterio seleccionado (sea o no favoritos)
   if (criterioOrden === 'nombre') {
-    productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
-  } else if (criterioOrden === 'precio') {
-    productosFiltrados.sort(
-      (a, b) => precioANumero(a.price) - precioANumero(b.price)
-    );
-  }
+  productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));} 
+  else if (criterioOrden === 'precio') {
+  productosFiltrados.sort(
+    (a, b) => precioANumero(a.price) - precioANumero(b.price));}
 
   const categoriasUnicas = [...new Set(products.map((p) => p.category))];
 
@@ -281,12 +288,11 @@ function FilterableProductTable({ products }) {
         criterioOrden={criterioOrden}
         onCriterioOrdenChange={setCriterioOrden}
         filtrarFavoritos={filtrarFavoritos}
-        onFiltrarFavoritosChange={toggleFiltrarFavoritos}
-      />
+        onFiltrarFavoritosChange={toggleFiltrarFavoritos}/>
 
       {/* Botones para mostrar/ocultar categorías */}
-      <section className="categorias-botones">
-        {categoriasUnicas.map((categoria) => (
+      <section className='categorias-botones'>
+        {categoriasUnicas.map(categoria => (
           <button
             key={categoria}
             className={`categoria-b ${
@@ -298,8 +304,7 @@ function FilterableProductTable({ products }) {
             type="button"
             style={{
               transition: 'background-color 0.4s ease, color 0.4s ease',
-            }}
-          >
+            }}>
             {categoriasVisibles[categoria]
               ? `Ocultar ${categoria}`
               : `Mostrar ${categoria}`}
@@ -311,30 +316,25 @@ function FilterableProductTable({ products }) {
         Restablecer filtros
       </button>
 
-      {/* Aquí aplicamos la animación al contenedor de la tabla de productos */}
-      <div
-        className={`product-table-container ${animating ? 'animating' : ''}`}
-        style={{
-          transition: 'opacity 0.3s ease', // Ajuste para la animación
-          opacity: animating ? 0.5 : 1,
-        }}
-      >
-        <ProductTable
-          products={productosFiltrados}
-          criterioOrden={criterioOrden}
-          favoritos={favoritos}
-          onToggleFavorito={toggleFavorito}/>
-      </div>
+
+      <ProductTable
+        products={productosFiltrados}
+        criterioOrden={criterioOrden}
+        favoritos={favoritos}
+        onToggleFavorito={toggleFavorito}/>
     </section>
   );
 }
 
 /*===Formulario (Cálculo y envío)===*/
-function Formulario({ products, onAgregarCompra }) {
+function Formulario({ products, onAgregarCompra, onAgregarProducto }) {
   const [nombre, setNombre] = useState('');
   const [cantidad, setCantidad] = useState(1);
+  const [precio, setPrecio] = useState('');
+  const [categoria, setCategoria] = useState('');
+  const [enStock, setEnStock] = useState(false);
 
-  // Lógica cuando se envía el formulario
+  // Lógica cuando se envía el formulario para añadir un nuevo producto a la lista de compras
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -342,59 +342,156 @@ function Formulario({ products, onAgregarCompra }) {
 
     if (!producto) {
       alert('Producto no encontrado');
-      return;}
+      return;
+    }
 
-    const precioNumerico = parseFloat(producto.price.replace('$', ''));
+    const precioNumerico = parseFloat(producto.price.replace('€', ''));
     const total = precioNumerico * cantidad;
 
-    // Llama a la función del padre para agregarlo a la lista
-    onAgregarCompra({
-      nombre: producto.name,
-      cantidad,
-      total: `$${total.toFixed(2)}`
+    // Llama a la función del padre para agregarlo a la lista de compras
+    onAgregarCompra({ nombre: producto.name,cantidad, total: `€${total.toFixed(2)}`
     });
 
     // Limpiar el formulario
     setNombre('');
-    setCantidad(1);};
+    setCantidad(1);
+  };
 
-  return (
-    <section className="section formulario">
-      <h2>Agregar Producto</h2>
-      <form id="form-add-product" className="valy" onSubmit={handleSubmit}>
-        {/* Nombre del producto */}
-        <label htmlFor="nombre">Producto:</label>
+  // Lógica para el formulario de agregar un nuevo producto
+  const handleAgregarProductoSubmit = (e) => {
+    e.preventDefault();
+
+    if (!nombre || !precio || !categoria) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+
+    // Crear el nuevo producto
+    const nuevoProducto = {
+      name: nombre,
+      price: precio,
+      category: categoria,
+      stocked: enStock,
+    };
+
+    // Llamar a la función para agregar el nuevo producto a la lista de productos
+    onAgregarProducto(nuevoProducto);
+
+    // Limpiar los campos del formulario
+    setNombre('');
+    setPrecio('');
+    setCategoria('');
+    setEnStock(false);
+  };
+
+return (
+  <section className="section formulario">
+  <h2>Agregar Producto</h2>
+  <form id="form-add-product" className="valy" onSubmit={handleSubmit}>
+    {/* Nombre del producto */}
+    <label htmlFor="nombre">Producto:</label>
+    <input
+      type="text"
+      id="nombre"
+      className="input-nombre"  // Agregado para aplicar los estilos
+      value={nombre}
+      onChange={(e) => setNombre(e.target.value)}
+      required
+    />
+
+    {/* Cantidad */}
+    <label htmlFor="cantidad">Cantidad:</label>
+    <input
+      type="number"
+      id="cantidad"
+      name="cantidad"
+      className="input-cantidad"  // Agregado para aplicar los estilos
+      min="1"
+      value={cantidad}
+      onChange={(e) => setCantidad(Number(e.target.value))}
+      required
+    />
+
+    <button type="submit">+ a Lista</button>
+  </form>
+
+  {/* Formulario para agregar un nuevo producto */}
+  <div className="nuevo-producto">
+    <h3>Nuevo Producto</h3><br/> 
+    <form onSubmit={handleAgregarProductoSubmit}>
+      {/* Nombre del nuevo producto */}
+      <label htmlFor="nombre-nuevo">Nombre del Producto:</label>
+      <input
+        type="text"
+        id="nombre-nuevo"
+        className="input-nuevo"  // No modificamos este campo porque es diferente
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+        required
+      />
+
+      {/* Precio del nuevo producto */}
+      <label htmlFor="precio">Precio:</label>
+      <input
+        type="text"
+        id="precio"
+        className="input-precio"  // Se mantiene separado de los otros inputs
+        value={precio}
+        onChange={(e) => setPrecio(e.target.value)}
+        required
+      />
+
+      {/* Categoría del nuevo producto */}
+      <label htmlFor="categoria">Categoría:</label>
+      <select
+        id="categoria"
+        className="input-categoria"  // Agregado para aplicar los estilos
+        value={categoria}
+        onChange={(e) => setCategoria(e.target.value)}
+        required
+      >
+        <option value="">Seleccione una categoría</option>
+        <option value="Lácteos">Lácteos</option>
+        <option value="Carnes">Carnes</option>
+        <option value="Verduras">Verduras</option>
+        <option value="Frutas">Frutas</option>
+        <option value="Panadería">Panadería</option>
+        <option value="Bebidas">Bebidas</option>
+      </select>
+
+      {/* Checkbox para saber si el producto está en stock */}
+      <label htmlFor="stock">
+        En Stock:
         <input
-          type="text"
-          id="nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          required/>
+          type="checkbox"
+          id="stock"
+          checked={enStock}
+          onChange={(e) => setEnStock(e.target.checked)}
+        />
+      </label>
 
-        {/* Cantidad */}
-        <label htmlFor="cantidad">Cantidad:</label>
-        <input
-          type="number"
-          id="cantidad"
-          name="cantidad"
-          min="1"
-          value={cantidad}
-          onChange={(e) => setCantidad(Number(e.target.value))}
-          required/>
+      <button type="submit">Añadir Producto</button>
+    </form>
+  </div>
 
-        <button type="submit">+ a Lista</button>
-      </form>
-      <Animation/>
-    </section>
-  );
-}
+  <br/><br/> 
+
+  <div className="animacion-container">
+    <Animation />
+  </div>
+</section>
+
+);
+};
 
 /*===Lista de Compras con items agregados===*/
 function ListaCompras({ compras }) {
   // Calcular total general
   const totalGeneral = compras.reduce((acc, item) => {
-    const num = parseFloat(item.total.replace('$', ''));
-    return acc + num;}, 0);
+    // Eliminar el símbolo(€) para calcular 
+    const num = parseFloat(item.total.replace('€', '').trim());
+    return acc + num;
+  }, 0);
 
   return (
     <section className="section shopping">
@@ -404,13 +501,13 @@ function ListaCompras({ compras }) {
           <li className="compra-item" key={index}>
             <span className="producto">{item.nombre}</span>
             <span className="cantidad">Cantidad: {item.cantidad}</span>
-            <span className="total">Total: {item.total}</span>
+            <span className="total">Total: {parseFloat(item.total.replace('€', '').trim()).toFixed(2)} €</span>
           </li>
         ))}
       </ul>
       <hr/>
       <section className="total-general">
-        <strong>Total: ${totalGeneral.toFixed(2)}</strong>
+        <strong>Total: {totalGeneral.toFixed(2)} €</strong>
       </section>
     </section>
   );
@@ -441,29 +538,46 @@ function Animation() {
 
 /*===App Principal con estado de compras===*/
 export default function App() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // Estado para los productos cargados
   const [compras, setCompras] = useState([]); // Lista de compras
 
+  // Cargar productos al inicio desde el archivo JSON
   useEffect(() => {
     fetch('/productos.json')
       .then(response => {
         if (!response.ok) throw new Error('Error al cargar los productos');
         return response.json();
       })
-      .then(data => setProducts(data))
+      .then(data => setProducts(data))  // Establecer productos en el estado
       .catch(error => console.error('Error al obtener los productos:', error));
   }, []);
 
-  // Agrega un producto a la lista de compras
+  // Función para agregar un producto a la lista de compras
   const handleAgregarCompra = (item) => {
-    setCompras(prev => [...prev, item]);
+    setCompras(prev => [...prev, item]);  // Añadir el item a la lista de compras
+  };
+
+  // Función para agregar un nuevo producto al listado de productos
+  const handleAgregarProducto = (nuevoProducto) => {
+    // Aquí podemos agregar el nuevo producto a la lista de productos
+    setProducts(prev => [...prev, nuevoProducto]);
   };
 
   return (
     <div className="container-padre">
+      {/* Tabla de productos filtrados y ordenados */}
       <FilterableProductTable products={products}/>
-      <Formulario products={products} onAgregarCompra={handleAgregarCompra} />
-      <ListaCompras compras={compras}/>
+
+      {/* Formulario para agregar productos a la lista de compras */}
+      <Formulario 
+        products={products} 
+        onAgregarCompra={handleAgregarCompra} 
+        onAgregarProducto={handleAgregarProducto} />
+
+      {/* Lista de compras con los productos seleccionados */}
+      <ListaCompras compras={compras} />
     </div>
   );
-}
+};
+
+

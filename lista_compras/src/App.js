@@ -58,11 +58,6 @@ function SearchBar({
 
 </nav>);}
 
-/*===ProductTable===*/
-
-/* La nueva estrella se verá junto al name, "☆", siendo invisble hasta pasar el ratón. 
-Su estado activado "⭐" */
-
 function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) {
   // Si el criterio es 'categoría', agrupamos los productos por su categoría
   if (criterioOrden === 'categoría') {
@@ -189,6 +184,7 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
   );
 }
 
+
 /*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
   const [filterText, setFilterText] = useState(''); // Texto de búsqueda
@@ -197,6 +193,7 @@ function FilterableProductTable({ products }) {
   const [categoriasVisibles, setCategoriasVisibles] = useState({}); // Control de visibilidad
   const [favoritos, setFavoritos] = useState([]); // Array nombres favoritos
   const [filtrarFavoritos, setFiltrarFavoritos] = useState(false); // Filtro por favoritos
+  const [animating, setAnimating] = useState(false); // Estado de animación
 
   // Al cargar productos, activar todas las categorías
   useEffect(() => {
@@ -207,6 +204,12 @@ function FilterableProductTable({ products }) {
     }, {});
     setCategoriasVisibles(estadoInicial);
   }, [products]);
+
+  // Detectar cambios en los filtros y activar la animación
+  useEffect(() => {
+    setAnimating(true);
+    setTimeout(() => setAnimating(false), 300); // Duración de la animación
+  }, [filterText, inStockOnly, criterioOrden, categoriasVisibles, favoritos, filtrarFavoritos]);
 
   // Toggle visibilidad de categoría
   const toggleCategoriaVisible = (categoria) => {
@@ -227,7 +230,8 @@ function FilterableProductTable({ products }) {
 
   // Toggle filtro favoritos: (des)activado
   const toggleFiltrarFavoritos = () => {
-    setFiltrarFavoritos((prev) => !prev);};
+    setFiltrarFavoritos((prev) => !prev);
+  };
 
   const precioANumero = (precioStr) => parseFloat(precioStr.replace('$', ''));
 
@@ -236,14 +240,17 @@ function FilterableProductTable({ products }) {
     product.name.toLowerCase().includes(filterText.toLowerCase()) &&
     (!inStockOnly || product.stocked) &&
     categoriasVisibles[product.category] &&
-    (!filtrarFavoritos || favoritos.includes(product.name)));
+    (!filtrarFavoritos || favoritos.includes(product.name))
+  );
 
-// Ordenar según el criterio seleccionado (sea o no favoritos)
+  // Ordenar según el criterio seleccionado (sea o no favoritos)
   if (criterioOrden === 'nombre') {
-  productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));} 
-  else if (criterioOrden === 'precio') {
-  productosFiltrados.sort(
-    (a, b) => precioANumero(a.price) - precioANumero(b.price));}
+    productosFiltrados.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (criterioOrden === 'precio') {
+    productosFiltrados.sort(
+      (a, b) => precioANumero(a.price) - precioANumero(b.price)
+    );
+  }
 
   const categoriasUnicas = [...new Set(products.map((p) => p.category))];
 
@@ -274,11 +281,12 @@ function FilterableProductTable({ products }) {
         criterioOrden={criterioOrden}
         onCriterioOrdenChange={setCriterioOrden}
         filtrarFavoritos={filtrarFavoritos}
-        onFiltrarFavoritosChange={toggleFiltrarFavoritos}/>
+        onFiltrarFavoritosChange={toggleFiltrarFavoritos}
+      />
 
       {/* Botones para mostrar/ocultar categorías */}
-      <section className='categorias-botones'>
-        {categoriasUnicas.map(categoria => (
+      <section className="categorias-botones">
+        {categoriasUnicas.map((categoria) => (
           <button
             key={categoria}
             className={`categoria-b ${
@@ -290,7 +298,8 @@ function FilterableProductTable({ products }) {
             type="button"
             style={{
               transition: 'background-color 0.4s ease, color 0.4s ease',
-            }}>
+            }}
+          >
             {categoriasVisibles[categoria]
               ? `Ocultar ${categoria}`
               : `Mostrar ${categoria}`}
@@ -302,16 +311,23 @@ function FilterableProductTable({ products }) {
         Restablecer filtros
       </button>
 
-
-      <ProductTable
-        products={productosFiltrados}
-        criterioOrden={criterioOrden}
-        favoritos={favoritos}
-        onToggleFavorito={toggleFavorito}/>
+      {/* Aquí aplicamos la animación al contenedor de la tabla de productos */}
+      <div
+        className={`product-table-container ${animating ? 'animating' : ''}`}
+        style={{
+          transition: 'opacity 0.3s ease', // Ajuste para la animación
+          opacity: animating ? 0.5 : 1,
+        }}
+      >
+        <ProductTable
+          products={productosFiltrados}
+          criterioOrden={criterioOrden}
+          favoritos={favoritos}
+          onToggleFavorito={toggleFavorito}/>
+      </div>
     </section>
   );
 }
-
 
 /*===Formulario (Cálculo y envío)===*/
 function Formulario({ products, onAgregarCompra }) {

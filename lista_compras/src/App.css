@@ -605,3 +605,27 @@ select:focus {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.6); 
   transition: all 0.3s ease; 
 }
+
+.precio-container {
+  display: flex;
+  align-items: center;
+}
+
+.input-precio {
+  padding-right: 25px; 
+  width: 100px; 
+}
+
+.euro-symbol {
+  margin-left: 5px; 
+  font-weight: bold; 
+}
+
+.error-sms {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 1em;
+  text-align: center;
+  font-weight: bold;
+}
+

@@ -202,7 +202,6 @@ function ProductTable({ products, criterioOrden, favoritos, onToggleFavorito }) 
   );
 }
 
-
 /*===FilterableProductTable===*/
 function FilterableProductTable({ products }) {
   const [filterText, setFilterText] = useState(''); // Texto de búsqueda
@@ -333,24 +332,33 @@ function Formulario({ products, onAgregarCompra, onAgregarProducto }) {
   const [precio, setPrecio] = useState('');
   const [categoria, setCategoria] = useState('');
   const [enStock, setEnStock] = useState(false);
+  const [error, setError] = useState('');
 
   // Lógica cuando se envía el formulario para añadir un nuevo producto a la lista de compras
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const producto = products.find(p => p.name.toLowerCase() === nombre.toLowerCase());
+    // Usamos trim() y toLowerCase() para asegurar que se comparen sin importar mayúsculas/minúsculas y sin espacios al principio o final
+    const producto = products.find(p => p.name.trim().toLowerCase() === nombre.trim().toLowerCase());
 
     if (!producto) {
       alert('Producto no encontrado');
       return;
     }
 
+    // Validamos si el producto está en stock
+    if (!producto.stocked) {
+      setError('El producto no está disponible en stock.');
+      return;
+    }
+
+    setError(''); // Limpiar el error si el producto está disponible en stock.
+
     const precioNumerico = parseFloat(producto.price.replace('€', ''));
     const total = precioNumerico * cantidad;
 
     // Llama a la función del padre para agregarlo a la lista de compras
-    onAgregarCompra({ nombre: producto.name,cantidad, total: `€${total.toFixed(2)}`
-    });
+    onAgregarCompra({ nombre: producto.name, cantidad, total: `€${total.toFixed(2)}` });
 
     // Limpiar el formulario
     setNombre('');
@@ -361,6 +369,7 @@ function Formulario({ products, onAgregarCompra, onAgregarProducto }) {
   const handleAgregarProductoSubmit = (e) => {
     e.preventDefault();
 
+    // Validación 
     if (!nombre || !precio || !categoria) {
       alert('Por favor completa todos los campos');
       return;
@@ -384,105 +393,119 @@ function Formulario({ products, onAgregarCompra, onAgregarProducto }) {
     setEnStock(false);
   };
 
-return (
-  <section className="section formulario">
-  <h2>Agregar Producto</h2>
-  <form id="form-add-product" className="valy" onSubmit={handleSubmit}>
-    {/* Nombre del producto */}
-    <label htmlFor="nombre">Producto:</label>
-    <input
-      type="text"
-      id="nombre"
-      className="input-nombre"  // Agregado para aplicar los estilos
-      value={nombre}
-      onChange={(e) => setNombre(e.target.value)}
-      required
-    />
+  // Función para manejar los cambios en el campo de precio
+  const handlePrecioChange = (e) => {
+    // Solo actualiza el estado si el valor es numérico o una cadena vacía
+    const valor = e.target.value;
+    if (/^\d*(\.\d{0,2})?$/.test(valor)) {
+      setPrecio(valor);  // Solo actualiza si es un número o un número con hasta dos decimales
+    }
+  };
 
-    {/* Cantidad */}
-    <label htmlFor="cantidad">Cantidad:</label>
-    <input
-      type="number"
-      id="cantidad"
-      name="cantidad"
-      className="input-cantidad"  // Agregado para aplicar los estilos
-      min="1"
-      value={cantidad}
-      onChange={(e) => setCantidad(Number(e.target.value))}
-      required
-    />
-
-    <button type="submit">+ a Lista</button>
-  </form>
-
-  {/* Formulario para agregar un nuevo producto */}
-  <div className="nuevo-producto">
-    <h3>Nuevo Producto</h3><br/> 
-    <form onSubmit={handleAgregarProductoSubmit}>
-      {/* Nombre del nuevo producto */}
-      <label htmlFor="nombre-nuevo">Nombre del Producto:</label>
-      <input
-        type="text"
-        id="nombre-nuevo"
-        className="input-nuevo"  // No modificamos este campo porque es diferente
-        value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
-        required
-      />
-
-      {/* Precio del nuevo producto */}
-      <label htmlFor="precio">Precio:</label>
-      <input
-        type="text"
-        id="precio"
-        className="input-precio"  // Se mantiene separado de los otros inputs
-        value={precio}
-        onChange={(e) => setPrecio(e.target.value)}
-        required
-      />
-
-      {/* Categoría del nuevo producto */}
-      <label htmlFor="categoria">Categoría:</label>
-      <select
-        id="categoria"
-        className="input-categoria"  // Agregado para aplicar los estilos
-        value={categoria}
-        onChange={(e) => setCategoria(e.target.value)}
-        required
-      >
-        <option value="">Seleccione una categoría</option>
-        <option value="Lácteos">Lácteos</option>
-        <option value="Carnes">Carnes</option>
-        <option value="Verduras">Verduras</option>
-        <option value="Frutas">Frutas</option>
-        <option value="Panadería">Panadería</option>
-        <option value="Bebidas">Bebidas</option>
-      </select>
-
-      {/* Checkbox para saber si el producto está en stock */}
-      <label htmlFor="stock">
-        En Stock:
+  return (
+    <section className="section formulario">
+      <h2>Agregar Producto</h2>
+      <form id="form-add-product" className="valy" onSubmit={handleSubmit}>
+        {/* Nombre del producto */}
+        <label htmlFor="nombre">Producto:</label>
         <input
-          type="checkbox"
-          id="stock"
-          checked={enStock}
-          onChange={(e) => setEnStock(e.target.checked)}
+          type="text"
+          id="nombre"
+          className="input-nombre"  // Agregado para aplicar los estilos
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          required
         />
-      </label>
 
-      <button type="submit">Añadir Producto</button>
-    </form>
-  </div>
+        {/* Cantidad */}
+        <label htmlFor="cantidad">Cantidad:</label>
+        <input
+          type="number"
+          id="cantidad"
+          name="cantidad"
+          className="input-cantidad"
+          min="1"
+          value={cantidad}
+          onChange={(e) => setCantidad(Number(e.target.value))}
+          required
+        />
 
-  <br/><br/> 
+        {/* Mensaje de error */}
+        {error && <div className="error-sms">{error}</div>}
 
-  <div className="animacion-container">
-    <Animation />
-  </div>
-</section>
+        <button type="submit">+ a Lista</button>
+      </form>
 
-);
+      {/* Formulario para agregar un nuevo producto */}
+      <div className="nuevo-producto">
+        <h3>Nuevo Producto</h3><br />
+        <form onSubmit={handleAgregarProductoSubmit}>
+          
+          <label htmlFor="nombre-nuevo">Nombre del Producto:</label>
+          <input
+            type="text"
+            id="nombre-nuevo"
+            className="input-nuevo"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            required
+          />
+
+          {/* Precio del nuevo producto */}
+          <label htmlFor="precio">Precio:</label>
+          <div className="precio-container">
+            <input
+              type="text"  // para controlar el formato en JS
+              id="precio"
+              className="input-precio"
+              value={precio}
+              onChange={handlePrecioChange}  // Usamos la función personalizada para filtrar números
+              required
+            />
+            <span className="euro-symbol">€</span> 
+          </div>
+
+          <label htmlFor="categoria">Categoría:</label>
+          <select
+            id="categoria"
+            className="input-categoria"
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+            required
+          >
+            <option value="">Seleccione una categoría</option>
+            <option value="Lácteos">Lácteos</option>
+            <option value="Carnes">Carnes</option>
+            <option value="Verduras">Verduras</option>
+            <option value="Frutas">Frutas</option>
+            <option value="Panadería">Panadería</option>
+            <option value="Bebidas">Bebidas</option>
+          </select>
+
+          {/* Checkbox para saber si el producto está en stock */}
+          <label htmlFor="stock">
+            En Stock:
+            <input
+              type="checkbox"
+              id="stock"
+              checked={enStock}
+              onChange={(e) => setEnStock(e.target.checked)}
+            />
+          </label>
+
+          <button type="submit">Añadir Producto</button>
+        </form>
+      </div>
+
+      <br /><br />
+
+      <div className="animacion-container">
+        <Animation />
+      </div>
+    </section>
+  );
 };
+
 
 /*===Lista de Compras con items agregados===*/
 function ListaCompras({ compras }) {
